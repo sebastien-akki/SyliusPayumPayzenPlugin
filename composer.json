@@ -1,0 +1,26 @@
+{
+  "name": "akki/sylius-payum-payzen-plugin",
+  "description": "Payum Payzen Bridge for Sylius",
+  "type": "sylius-plugin",
+  "require": {
+    "sylius/sylius": "^1.5",
+    "ekyna/payum-payzen": "1.5.x-dev"
+  },
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Akki",
+      "email": "support@akki.fr"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "Akki\\SyliusPayumPayzenPlugin\\": "src/"
+    }
+  },
+  "extra": {
+    "branch-alias": {
+      "dev-master": "1.0-dev"
+    }
+  }
+}

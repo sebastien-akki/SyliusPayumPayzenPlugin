@@ -1,0 +1,19 @@
+services:
+    akki.payzen.form.type.gateway_configuration:
+        class: Akki\SyliusPayumPayzenPlugin\Form\Type\PayzenGatewayConfigurationType
+        tags:
+            - { name: sylius.gateway_configuration_type, type: payzen, label: akki.payzen.gateway_label }
+            - { name: form.type }
+    akki.payzen.gateway_factory:
+        class: Payum\Core\Bridge\Symfony\Builder\GatewayFactoryBuilder
+        arguments: [Ekyna\Component\Payum\Payzen\PayzenGatewayFactory]
+        tags:
+            - { name: payum.gateway_factory_builder, factory: payzen }
+    akki.payzen.action.convert_payment_preprend:
+        public: true
+        class: Akki\SyliusPayumPayzenPlugin\Action\SyliusConvertAction
+        tags:
+            - { name: payum.action, factory: payzen, alias: sylius.payzen.convert_payment_preprend, prepend: true }
+    Akki\SyliusPayumPayzenPlugin\Controller\NotifyController:
+        public: true
+        class: Akki\SyliusPayumPayzenPlugin\Controller\NotifyController

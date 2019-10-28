@@ -1,0 +1,8 @@
+akki:
+  payzen:
+    site_id:
+      not_blank: traduction_missing
+    certificate:
+      not_blank: traduction_missing
+    directory:
+      not_blank: traduction_missing

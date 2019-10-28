@@ -1,0 +1,27 @@
+akki:
+  payzen:
+    gateway_label: Payzen paiement
+    fields:
+      endpoint:
+        label: traduction_missing
+        help: traduction_missing
+      site_id:
+        label: traduction_missing
+        help: traduction_missing
+      certificate:
+        label: traduction_missing
+      ctx_mode:
+        label: traduction_missing
+      directory:
+        label: traduction_missing
+      debug:
+        label: traduction_missing
+    endpoint:
+      payzen: traduction_missing
+      systempay: traduction_missing
+    mode:
+      production: traduction_missing
+      test: traduction_missing
+    debug:
+      no: traduction_missing
+      yes: traduction_missing

@@ -1,0 +1,27 @@
+akki:
+  payzen:
+    gateway_label: Payzen paiement
+    fields:
+      endpoint:
+        label: URL d'appel
+        help: URL d'appel de la plateforme
+      site_id:
+        label: Identifiant du site
+        help: Identifiant du site
+      certificate:
+        label: Clé
+      ctx_mode:
+        label: Mode
+      directory:
+        label: Répertoire de gestion de transaction
+      debug:
+        label: Debogage
+    endpoint:
+      payzen: PayZen
+      systempay: SystemPay
+    mode:
+      production: Production
+      test: Test
+    debug:
+      no: Non
+      yes: Oui

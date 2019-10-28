@@ -1,0 +1,4 @@
+akki_sylius_payum_payzen_notify:
+    path: /payzen/notify
+    defaults:
+        _controller: Akki\SyliusPayumPayzenPlugin\Controller\NotifyController::doAction
