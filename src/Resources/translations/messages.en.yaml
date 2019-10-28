@@ -19,7 +19,7 @@ akki:
     endpoint:
       payzen: traduction_missing
       systempay: traduction_missing
-    mode:
+    ctx_mode:
       production: traduction_missing
       test: traduction_missing
     debug:

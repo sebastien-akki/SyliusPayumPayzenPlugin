@@ -3,8 +3,8 @@ akki:
     gateway_label: Payzen paiement
     fields:
       endpoint:
-        label: URL d'appel
-        help: URL d'appel de la plateforme
+        label: Payzen ou SytemPay ?
+        help: Type d'appel de la plateforme
       site_id:
         label: Identifiant du site
         help: Identifiant du site
@@ -19,7 +19,7 @@ akki:
     endpoint:
       payzen: PayZen
       systempay: SystemPay
-    mode:
+    ctx_mode:
       production: Production
       test: Test
     debug:

@@ -50,7 +50,6 @@ final class PayzenGatewayConfigurationType extends AbstractType
                 ],
             ])
             ->add('ctx_mode', ChoiceType::class, [
-                'expanded' => true,
                 'label' => 'akki.payzen.fields.ctx_mode.label',
                 'choices' => [
                     'akki.payzen.ctx_mode.production' => self::MODE_PRODUCTION,
@@ -67,7 +66,6 @@ final class PayzenGatewayConfigurationType extends AbstractType
                 ],
             ])
             ->add('debug', ChoiceType::class, [
-                'expanded' => true,
                 'label' => 'akki.payzen.fields.debug.label',
                 'choices' => [
                     'akki.payzen.debug.no' => false,
