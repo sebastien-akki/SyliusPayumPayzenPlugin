@@ -13,7 +13,7 @@ final class PayzenGatewayConfigurationType extends AbstractType
 
     private const MODE_PRODUCTION = 'PRODUCTION';
     private const MODE_TEST = 'TEST';
-    private const ENDPOINT_PAYZEN = 'PAYZEN';
+    private const ENDPOINT_PAYZEN = null;
     private const ENDPOINT_SYSTEMPAY = 'SYSTEMPAY';
 
     /**
