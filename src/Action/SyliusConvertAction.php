@@ -75,7 +75,7 @@ class SyliusConvertAction implements ActionInterface, GatewayAwareInterface
         $amount = (string)$payment->getAmount();
 
         $model['vads_amount'] = $amount;
-        $model['vads_currency'] = 978;
+        $model['vads_currency'] = "978";
     }
 
     /**
