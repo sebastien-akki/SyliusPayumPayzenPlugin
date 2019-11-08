@@ -18,7 +18,7 @@ use Payum\Core\Request\GetCurrency;
  */
 class SyliusConvertAction implements ActionInterface, GatewayAwareInterface
 {
-    public const PAYMENT_ID_FORMAT = 'sylius_%s';
+    public const PAYMENT_ID_FORMAT = '%s';
 
     use GatewayAwareTrait;
 
