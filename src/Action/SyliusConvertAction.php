@@ -56,7 +56,7 @@ class SyliusConvertAction implements ActionInterface, GatewayAwareInterface
 
         $config = $payment_method->getGatewayConfig()->getConfig();
 
-        $model['vads_payment_cards'] = $config['payment_cards'];
+        $model['vads_payment_cards'] = explode(';', $config['payment_cards']);
 
         $request->setResult((array)$model);
     }
