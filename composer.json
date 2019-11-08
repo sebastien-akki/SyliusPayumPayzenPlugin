@@ -21,6 +21,11 @@
   "extra": {
     "branch-alias": {
       "dev-master": "1.0-dev"
+    },
+    "patches": {
+      "ekyna/payum-payzen": {
+        "add meta":"patch/ekyna_api.patch"
+      }
     }
   }
 }

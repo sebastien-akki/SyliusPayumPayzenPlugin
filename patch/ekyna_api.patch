@@ -1,0 +1,16 @@
+Index: vendor/ekyna/payum-payzen/Api/Api.php
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- vendor/ekyna/payum-payzen/Api/Api.php	(date 1573216751232)
++++ vendor/ekyna/payum-payzen/Api/Api.php	(date 1573216751232)
+@@ -366,7 +366,7 @@
+             ->setAllowedValues('vads_currency', $this->getCurrencyCodes())
+             ->setAllowedValues('vads_language', $this->getLanguageCodes())
+             ->setAllowedValues('vads_page_action', 'PAYMENT')
+-            ->setAllowedValues('vads_payment_cards', $this->getCardsCodes())
++            //->setAllowedValues('vads_payment_cards', $this->getCardsCodes())
+             ->setAllowedValues('vads_payment_config', function ($value) {
+                 if ($value === 'SINGLE') {
+                     return true;
