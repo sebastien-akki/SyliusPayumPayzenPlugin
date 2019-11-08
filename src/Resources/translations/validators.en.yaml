@@ -4,5 +4,7 @@ akki:
       not_blank: traduction_missing
     certificate:
       not_blank: traduction_missing
+    payment_cards:
+      not_blank: traduction_missing
     directory:
       not_blank: traduction_missing

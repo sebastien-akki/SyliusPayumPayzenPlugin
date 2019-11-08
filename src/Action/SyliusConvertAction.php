@@ -11,6 +11,7 @@ use Payum\Core\GatewayAwareInterface;
 use Payum\Core\GatewayAwareTrait;
 use Payum\Core\Request\Convert;
 use Payum\Core\Request\GetCurrency;
+use Sylius\Component\Core\Model\PaymentMethodInterface;
 
 /**
  * Class SyliusConvertAction
@@ -18,8 +19,6 @@ use Payum\Core\Request\GetCurrency;
  */
 class SyliusConvertAction implements ActionInterface, GatewayAwareInterface
 {
-    public const PAYMENT_ID_FORMAT = '%s';
-
     use GatewayAwareTrait;
 
     /**
@@ -51,6 +50,13 @@ class SyliusConvertAction implements ActionInterface, GatewayAwareInterface
         if (false == $model['vads_cust_email']) {
             $this->setEmail($model, $payment);
         }
+
+        /** @var PaymentMethodInterface $payment_method */
+        $payment_method = $payment->getMethod();
+
+        $config = $payment_method->getGatewayConfig()->getConfig();
+
+        $model['vads_payment_cards'] = $config['payment_cards'];
 
         $request->setResult((array)$model);
     }
@@ -84,9 +90,7 @@ class SyliusConvertAction implements ActionInterface, GatewayAwareInterface
      */
     protected function setReference(ArrayObject $model, PaymentInterface $payment): void
     {
-        // The ID should be always unique so we can use it,
-        // but we can also use Unix timestamp to get a really uniq value
-        $model['vads_order_id'] = sprintf(static::PAYMENT_ID_FORMAT, $payment->getId());
+        $model['vads_order_id'] = $payment->getId();
     }
 
     /**

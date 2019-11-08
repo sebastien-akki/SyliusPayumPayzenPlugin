@@ -4,5 +4,7 @@ akki:
       not_blank: L'identifiant du site ne peut pas être vide
     certificate:
       not_blank: La clé ne peut pas être vide
+    payment_cards:
+      not_blank: Les moyens de paiement ne peuvent pas être vides
     directory:
       not_blank: Le répertoire de gestion de transaction ne peut pas être vide

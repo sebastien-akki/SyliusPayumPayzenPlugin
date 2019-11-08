@@ -10,6 +10,8 @@ akki:
         help: traduction_missing
       certificate:
         label: traduction_missing
+      payment_cards:
+        label: traduction_missing
       ctx_mode:
         label: traduction_missing
       directory:

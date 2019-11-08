@@ -65,6 +65,15 @@ final class PayzenGatewayConfigurationType extends AbstractType
                     ]),
                 ],
             ])
+            ->add('payment_cards', TextType::class, [
+                'label' => 'akki.payzen.fields.payment_cards.label',
+                'constraints' => [
+                    new NotBlank([
+                        'message' => 'akki.payzen.payment_cards.not_blank',
+                        'groups' => ['sylius']
+                    ]),
+                ],
+            ])
             ->add('debug', ChoiceType::class, [
                 'label' => 'akki.payzen.fields.debug.label',
                 'choices' => [

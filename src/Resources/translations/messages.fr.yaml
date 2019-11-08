@@ -10,6 +10,8 @@ akki:
         help: Identifiant du site
       certificate:
         label: Clé
+      payment_cards:
+        label: Moyens de paiements autorisés
       ctx_mode:
         label: Mode
       directory:
