@@ -39,17 +39,9 @@ class SyliusConvertAction implements ActionInterface, GatewayAwareInterface
 
         $model = ArrayObject::ensureArrayObject($payment->getDetails());
 
-        if (false == $model['vads_amount']) {
-            $this->setAmount($model, $payment);
-        }
-
-        if (false == $model['vads_order_id']) {
-            $this->setDonneesCommande($model, $payment);
-        }
-
-        if (false == $model['vads_cust_email']) {
-            $this->setDonneesAcheteur($model, $payment);
-        }
+        $this->setAmount($model, $payment);
+        $this->setDonneesCommande($model, $payment);
+        $this->setDonneesAcheteur($model, $payment);
 
         /** @var PaymentMethodInterface $payment_method */
         $payment_method = $payment->getMethod();
@@ -78,10 +70,21 @@ class SyliusConvertAction implements ActionInterface, GatewayAwareInterface
     protected function setAmount(ArrayObject $model, PaymentInterface $payment): void
     {
         $this->gateway->execute($currency = new GetCurrency($payment->getCurrencyCode()));
-        $amount = (string)$payment->getAmount();
 
-        $model['vads_amount'] = $amount;
-        $model['vads_currency'] = $currency->numeric;
+        /** @var OrderInterface $order */
+        $order = $payment->getOrder();
+
+        $hasOffresADL = $order->hasOffresADL();
+        $amount = $order->montantProductsNotOffresADL();
+
+        if ($amount > 0){
+            $model['vads_page_action'] = $hasOffresADL ? 'REGISTER_PAY' : 'PAYMENT';
+            $model['vads_amount'] = (string)$amount;
+            $model['vads_currency'] = $currency->numeric;
+            $model['vads_payment_config'] = 'SINGLE';
+        }else {
+            $model['vads_page_action'] = 'REGISTER';
+        }
     }
 
     /**
