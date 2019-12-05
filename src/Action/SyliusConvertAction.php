@@ -112,7 +112,7 @@ class SyliusConvertAction implements ActionInterface, GatewayAwareInterface
             $model["vads_product_ext_id{$index}"] = $product->getSlug();
             $model["vads_product_label{$index}"] = $product->getName();
             $model["vads_product_amount{$index}"] = $product->getPrixKMBrut();
-            $model["vads_product_type{$index}"] = $product->getTypeProduit();
+            $model["vads_product_type{$index}"] = 'ENTERTAINMENT';
             $model["vads_product_ref{$index}"] = $product->getCode();
             $model["vads_product_qty{$index}"] = $orderItem->getQuantity();
         }
