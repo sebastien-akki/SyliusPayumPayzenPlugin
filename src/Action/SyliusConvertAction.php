@@ -106,7 +106,7 @@ class SyliusConvertAction implements ActionInterface, GatewayAwareInterface
         $model['vads_nb_products'] = $order->getTotalQuantity();
 
         /** @var OrderItemInterface $orderItem */
-        foreach (array_values($order->getItems()) as $index => $orderItem){
+        foreach (array_values($order->getItems()->toArray()) as $index => $orderItem){
             /** @var Product $product */
             $product = $orderItem->getProduct();
             $model["vads_product_ext_id{$index}"] = $product->getSlug();
