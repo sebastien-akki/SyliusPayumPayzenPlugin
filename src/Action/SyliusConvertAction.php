@@ -110,7 +110,7 @@ class SyliusConvertAction implements ActionInterface, GatewayAwareInterface
             /** @var Product $product */
             $product = $orderItem->getProduct();
             $model["vads_product_ext_id{$index}"] = $product->getSlug();
-            $model["vads_product_label{$index}"] = $product->getName();
+            $model["vads_product_label{$index}"] = $this->oteAccents($product->getName());
             $model["vads_product_amount{$index}"] = $product->getPrixKMBrut();
             $model["vads_product_type{$index}"] = 'ENTERTAINMENT';
             $model["vads_product_ref{$index}"] = $product->getCode();
@@ -132,33 +132,39 @@ class SyliusConvertAction implements ActionInterface, GatewayAwareInterface
             $model['vads_cust_id'] = $customer->getId();
             $model['vads_cust_title'] = $customer->getGender() === 'm' ? 'Mr' : 'Mme';
             $model['vads_cust_status'] = $defaultAddress !== null && !empty($defaultAddress->getCompany()) ? 'COMPANY' : 'PRIVATE';
-            $model['vads_cust_first_name'] = $customer->getFirstName();
-            $model['vads_cust_last_name'] = $customer->getLastName();
-            $model['vads_cust_legal_name'] = $defaultAddress !== null && !empty($defaultAddress->getCompany()) ? $defaultAddress->getCompany() : '';
+            $model['vads_cust_first_name'] = $this->oteAccents($customer->getFirstName());
+            $model['vads_cust_last_name'] = $this->oteAccents($customer->getLastName());
+            $model['vads_cust_legal_name'] = $defaultAddress !== null && !empty($defaultAddress->getCompany()) ? $this->oteAccents($defaultAddress->getCompany()) : '';
             $model['vads_cust_cell_phone'] = '';
             $model['vads_cust_phone'] = $customer->getPhoneNumber();
             $model['vads_cust_address_number'] = '';
-            $model['vads_cust_address'] = $defaultAddress !== null && !empty($defaultAddress->getStreet()) ? $defaultAddress->getStreet() : '';
+            $model['vads_cust_address'] = $defaultAddress !== null && !empty($defaultAddress->getStreet()) ? $this->oteAccents($defaultAddress->getStreet()) : '';
             $model['vads_cust_district'] = '';
             $model['vads_cust_zip'] = $defaultAddress !== null && !empty($defaultAddress->getPostcode()) ? $defaultAddress->getPostcode() : '';
-            $model['vads_cust_city'] = $defaultAddress !== null && !empty($defaultAddress->getCity()) ? $defaultAddress->getCity() : '';
+            $model['vads_cust_city'] = $defaultAddress !== null && !empty($defaultAddress->getCity()) ? $this->oteAccents($defaultAddress->getCity()) : '';
             $model['vads_cust_state'] = '';
             $model['vads_cust_country'] = $defaultAddress !== null && !empty($defaultAddress->getCountryCode()) ? $defaultAddress->getCountryCode() : '';
 
             $billingAddress = $order->getBillingAddress();
-            $model['vads_ship_to_city'] = $billingAddress !== null && !empty($billingAddress->getCity()) ? $billingAddress->getCity() : '';
+            $model['vads_ship_to_city'] = $billingAddress !== null && !empty($billingAddress->getCity()) ? $this->oteAccents($billingAddress->getCity()) : '';
             $model['vads_ship_to_country'] = $billingAddress !== null && !empty($billingAddress->getCountryCode()) ? $billingAddress->getCountryCode() : '';
             $model['vads_ship_to_district'] = '';
-            $model['vads_ship_to_first_name'] = $billingAddress !== null && !empty($billingAddress->getFirstName()) ? $billingAddress->getFirstName() : '';
-            $model['vads_ship_to_last_name'] = $billingAddress !== null && !empty($billingAddress->getLastName()) ? $billingAddress->getLastName() : '';
-            $model['vads_ship_to_legal_name'] = $billingAddress !== null && !empty($billingAddress->getCompany()) ? $billingAddress->getCompany() : '';
+            $model['vads_ship_to_first_name'] = $billingAddress !== null && !empty($billingAddress->getFirstName()) ? $this->oteAccents($billingAddress->getFirstName()) : '';
+            $model['vads_ship_to_last_name'] = $billingAddress !== null && !empty($billingAddress->getLastName()) ? $this->oteAccents($billingAddress->getLastName()) : '';
+            $model['vads_ship_to_legal_name'] = $billingAddress !== null && !empty($billingAddress->getCompany()) ? $this->oteAccents($billingAddress->getCompany()) : '';
             $model['vads_ship_to_phone_num'] = $billingAddress !== null && !empty($billingAddress->getPhoneNumber()) ? $billingAddress->getPhoneNumber() : '';
             $model['vads_ship_to_state'] = '';
             $model['vads_ship_to_status'] = $billingAddress !== null && !empty($billingAddress->getCompany()) ? 'COMPANY' : 'PRIVATE';
             $model['vads_ship_to_street_number'] = '';
-            $model['vads_ship_to_street'] = $billingAddress !== null && !empty($billingAddress->getStreet()) ? $billingAddress->getStreet() : '';
-            $model['vads_ship_to_street2'] = $billingAddress !== null && !empty($billingAddress->getStreetComplement()) ? $billingAddress->getStreetComplement() : '';
+            $model['vads_ship_to_street'] = $billingAddress !== null && !empty($billingAddress->getStreet()) ? $this->oteAccents($billingAddress->getStreet()) : '';
+            $model['vads_ship_to_street2'] = $billingAddress !== null && !empty($billingAddress->getStreetComplement()) ? $this->oteAccents($billingAddress->getStreetComplement()) : '';
             $model['vads_ship_to_zip'] = $billingAddress !== null && !empty($billingAddress->getPostcode()) ? $billingAddress->getPostcode() : '';
         }
+    }
+
+    function oteAccents($str)
+    {
+        $translit = array('Á' => 'A', 'À' => 'A', 'Â' => 'A', 'Ä' => 'A', 'Ã' => 'A', 'Å' => 'A', 'Ç' => 'C', 'É' => 'E', 'È' => 'E', 'Ê' => 'E', 'Ë' => 'E', 'Í' => 'I', 'Ï' => 'I', 'Î' => 'I', 'Ì' => 'I', 'Ñ' => 'N', 'Ó' => 'O', 'Ò' => 'O', 'Ô' => 'O', 'Ö' => 'O', 'Õ' => 'O', 'Ú' => 'U', 'Ù' => 'U', 'Û' => 'U', 'Ü' => 'U', 'Ý' => 'Y', 'á' => 'a', 'à' => 'a', 'â' => 'a', 'ä' => 'a', 'ã' => 'a', 'å' => 'a', 'ç' => 'c', 'é' => 'e', 'è' => 'e', 'ê' => 'e', 'ë' => 'e', 'í' => 'i', 'ì' => 'i', 'î' => 'i', 'ï' => 'i', 'ñ' => 'n', 'ó' => 'o', 'ò' => 'o', 'ô' => 'o', 'ö' => 'o', 'õ' => 'o', 'ú' => 'u', 'ù' => 'u', 'û' => 'u', 'ü' => 'u', 'ý' => 'y', 'ÿ' => 'y');
+        return strtr($str, $translit);
     }
 }
