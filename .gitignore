@@ -1,3 +1,8 @@
 /vendor/
 /composer.lock
 /.idea/
+Thumbs.db
+ehthumbs.db
+.DS_Store
+vendor
+composer.lock
