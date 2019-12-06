@@ -18,10 +18,10 @@ use Sylius\Component\Core\Model\OrderItemInterface;
 use Sylius\Component\Core\Model\Product;
 
 /**
- * Class SyliusConvertAction
+ * Class ConvertPaymentAction
  * @package Akki\SyliusPayumPayzenPlugin\Action
  */
-class SyliusConvertAction implements ActionInterface, GatewayAwareInterface
+class ConvertPaymentAction implements ActionInterface, GatewayAwareInterface
 {
     use GatewayAwareTrait;
 
@@ -67,7 +67,7 @@ class SyliusConvertAction implements ActionInterface, GatewayAwareInterface
      * @param ArrayObject $model
      * @param PaymentInterface $payment
      */
-    protected function setAmount(ArrayObject $model, PaymentInterface $payment): void
+    protected function setAmount(ArrayObject $model, PaymentInterface $payment)
     {
         $this->gateway->execute($currency = new GetCurrency($payment->getCurrencyCode()));
 
@@ -91,7 +91,7 @@ class SyliusConvertAction implements ActionInterface, GatewayAwareInterface
      * @param ArrayObject $model
      * @param PaymentInterface $payment
      */
-    protected function setDonneesCommande(ArrayObject $model, PaymentInterface $payment): void
+    protected function setDonneesCommande(ArrayObject $model, PaymentInterface $payment)
     {
         $model['vads_order_id'] = $payment->getId();
 
@@ -122,7 +122,7 @@ class SyliusConvertAction implements ActionInterface, GatewayAwareInterface
      * @param ArrayObject $model
      * @param PaymentInterface $payment
      */
-    protected function setDonneesAcheteur(ArrayObject $model, PaymentInterface $payment): void
+    protected function setDonneesAcheteur(ArrayObject $model, PaymentInterface $payment)
     {
         $order = $payment->getOrder();
         /** @var Customer $customer */
