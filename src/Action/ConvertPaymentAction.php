@@ -75,7 +75,9 @@ class ConvertPaymentAction implements ActionInterface, GatewayAwareInterface
         $order = $payment->getOrder();
 
         $hasOffresADL = $order->hasOffresADL();
-        $amount = $order->montantProductsNotOffresADL();
+        $fraisDePortKMStandard = $order->getFraisPortKMStandard()*100;
+        $fraisPortIdefix = $order->getFraisPortIdefix();
+        $amount = $order->montantProductsNotOffresADL() + $fraisDePortKMStandard + $fraisPortIdefix;
 
         if ($amount > 0){
             $model['vads_page_action'] = $hasOffresADL ? 'REGISTER_PAY' : 'PAYMENT';
