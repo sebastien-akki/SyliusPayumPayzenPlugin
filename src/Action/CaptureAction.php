@@ -60,6 +60,11 @@ class CaptureAction implements ActionInterface, GatewayAwareInterface, GenericTo
                 );
                 $model['vads_url_check'] = $notifyToken->getTargetUrl();
             }
+
+            $model['vads_redirect_success_timeout'] = 0;
+            $model['vads_redirect_success_message'] = 'Redirection vers Kiosquemag dans quelques secondes...';
+            $model['vads_redirect_error_timeout'] = 1;
+            $model['vads_redirect_error_message'] = 'Redirection vers Kiosquemag dans quelques secondes...';
         }
 
         if (false == $model['vads_trans_id']) {
