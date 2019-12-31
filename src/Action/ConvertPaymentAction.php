@@ -191,6 +191,7 @@ class ConvertPaymentAction implements ActionInterface, GatewayAwareInterface
             "\xE2\x80\xB9" => "'", // U+2039 single left-pointing angle quotation mark
             "\xE2\x80\xBA" => "'",
         );
-        return strtr($str, $translit);
+        $strModified = strtr($str, $translit);
+        return preg_replace("/[^A-Za-z0-9 ]/", ' ', $strModified);;
     }
 }
