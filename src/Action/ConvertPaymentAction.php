@@ -95,10 +95,11 @@ class ConvertPaymentAction implements ActionInterface, GatewayAwareInterface
      */
     protected function setDonneesCommande(ArrayObject $model, PaymentInterface $payment)
     {
-        $model['vads_order_id'] = $payment->getId();
-
         /** @var OrderInterface $order */
         $order = $payment->getOrder();
+
+        $model['vads_order_id'] = $order->getId();
+
         $comment = "Order: {$order->getNumber()}";
         if (null !== $customer = $order->getCustomer()) {
             $comment .= ", Customer: {$customer->getId()}";
