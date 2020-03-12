@@ -75,9 +75,7 @@ class ConvertPaymentAction implements ActionInterface, GatewayAwareInterface
         $order = $payment->getOrder();
 
         $hasOffresADL = $order->hasOffresADL();
-        $fraisDePortKMStandard = $order->getFraisPortKMStandard()*100;
-        $fraisPortIdefix = $order->getFraisPortIdefix();
-        $amount = $order->montantProductsNotOffresADL() + $fraisDePortKMStandard + $fraisPortIdefix;
+        $amount = $order->getTotal() - $order->montantProductsOffresADL();
 
         if ($amount > 0){
             $model['vads_page_action'] = $hasOffresADL ? 'REGISTER_PAY' : 'PAYMENT';
@@ -114,7 +112,7 @@ class ConvertPaymentAction implements ActionInterface, GatewayAwareInterface
             $product = $orderItem->getProduct();
             $model["vads_product_ext_id{$index}"] = $product->getSlug();
             $model["vads_product_label{$index}"] = $this->specialChars($product->getName());
-            $model["vads_product_amount{$index}"] = $product->getPrixKMBrut();
+            $model["vads_product_amount{$index}"] = $orderItem->getUnitPrice();
             $model["vads_product_type{$index}"] = 'ENTERTAINMENT';
             $model["vads_product_ref{$index}"] = $product->getCode();
             $model["vads_product_qty{$index}"] = $orderItem->getQuantity();
