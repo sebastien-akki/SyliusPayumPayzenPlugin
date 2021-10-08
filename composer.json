@@ -3,9 +3,9 @@
   "description": "Payum Payzen Bridge for Sylius",
   "type": "sylius-plugin",
   "require": {
-    "payum/core": "^1.5",
+    "payum/core": "~1.5",
     "php": "^7.0",
-    "php-http/guzzle6-adapter": "^1.1",
+    "php-http/guzzle6-adapter": "^1.1|~2.0",
     "psr/log": "~1.0",
     "sylius/sylius": "~1.5",
     "symfony/process": "~2.7|~3.0|~4.0"
