@@ -39,7 +39,7 @@ class Api
     /**
      * @var array
      */
-    private array $config;
+    private $config;
 
 
     /**
