@@ -55,7 +55,7 @@ class PayzenGatewayFactory extends GatewayFactory
             'payum.action.api.response'    => new ApiResponseAction(),
         ]);
 
-        if (false === $config['payum.api']) {
+        if (false == $config['payum.api']) {
             $config['payum.default_options'] = [
                 'site_id'     => null,
                 'certificate' => null,

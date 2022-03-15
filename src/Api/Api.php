@@ -72,7 +72,7 @@ class Api
 
         $date = (new DateTime())->format('Ymd');
         $fileDate = date('Ymd', filemtime($path));
-        $isDailyFirstAccess = ($date !== $fileDate);
+        $isDailyFirstAccess = ($date != $fileDate);
 
         // Open file
         $handle = fopen($path, 'rb+');

@@ -47,7 +47,7 @@ class CaptureAction implements ActionInterface, GatewayAwareInterface, GenericTo
                 'vads_url_return',   // Retour à la boutique
             ];
             foreach ($doneUrlFields as $field) {
-                if (false === $model[$field]) {
+                if (false == $model[$field]) {
                     $model[$field] = $targetUrl;
                 }
             }
@@ -67,7 +67,7 @@ class CaptureAction implements ActionInterface, GatewayAwareInterface, GenericTo
             $model['vads_redirect_error_message'] = 'Redirection vers Kiosquemag dans quelques secondes...';
         }
 
-        if (false === $model['vads_trans_id']) {
+        if (false == $model['vads_trans_id']) {
             $this->gateway->execute(new Request($model));
         }
 

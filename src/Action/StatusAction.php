@@ -25,12 +25,12 @@ class StatusAction implements ActionInterface
 
         $model = ArrayObject::ensureArrayObject($request->getModel());
 
-        if (false === $model['vads_trans_id']) {
+        if (false == $model['vads_trans_id']) {
             $request->markNew();
             return;
         }
 
-        if (false !== $code = $model['vads_result']) {
+        if (false != $code = $model['vads_result']) {
             switch ($code) {
                 case "00" : // transaction approuvée ou traitée avec succès
                     $request->markCaptured();
