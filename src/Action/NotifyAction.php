@@ -25,7 +25,7 @@ class NotifyAction implements ActionInterface, GatewayAwareInterface
      *
      * @param Notify $request
      */
-    public function execute($request)
+    public function execute($request): void
     {
         RequestNotSupportedException::assertSupports($this, $request);
 
@@ -41,7 +41,7 @@ class NotifyAction implements ActionInterface, GatewayAwareInterface
     /**
      * {@inheritDoc}
      */
-    public function supports($request)
+    public function supports($request): bool
     {
         return $request instanceof Notify
             && $request->getModel() instanceof ArrayAccess;

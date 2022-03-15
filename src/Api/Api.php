@@ -15,20 +15,31 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class Api
 {
-    /**
-     * @var OptionsResolver
-     */
-    private $configResolver;
+    public const MODE_TEST       = 'TEST';
+    public const MODE_PRODUCTION = 'PRODUCTION';
+
+    public const HASH_MODE_SHA1   = 'SHA1';
+    public const HASH_MODE_SHA256 = 'SHA256';
+
+    public const ENDPOINT_LYRA  = 'LYRA';
+    public const ENDPOINT_PAYZEN  = 'PAYZEN';
+    public const ENDPOINT_SCELLIUS  = 'SCELLIUS';
+    public const ENDPOINT_SYSTEMPAY = 'SYSTEMPAY';
 
     /**
-     * @var OptionsResolver
+     * @var OptionsResolver|null
      */
-    private $requestOptionsResolver;
+    private ?OptionsResolver $configResolver;
+
+    /**
+     * @var OptionsResolver|null
+     */
+    private ?OptionsResolver $requestOptionsResolver;
 
     /**
      * @var array
      */
-    private $config;
+    private array $config;
 
 
     /**
@@ -36,7 +47,7 @@ class Api
      *
      * @param array $config
      */
-    public function setConfig(array $config)
+    public function setConfig(array $config): void
     {
         $this->config = $this
             ->getConfigResolver()
@@ -49,7 +60,7 @@ class Api
      * @return string
      * @throws Exception
      */
-    public function getTransactionId()
+    public function getTransactionId(): string
     {
         $path = $this->getDirectoryPath() . 'transaction_id';
 
@@ -61,10 +72,10 @@ class Api
 
         $date = (new DateTime())->format('Ymd');
         $fileDate = date('Ymd', filemtime($path));
-        $isDailyFirstAccess = ($date != $fileDate);
+        $isDailyFirstAccess = ($date !== $fileDate);
 
         // Open file
-        $handle = fopen($path, 'r+');
+        $handle = fopen($path, 'rb+');
         if (false === $handle) {
             throw new RuntimeException('Failed to open the transaction ID file.');
         }
@@ -102,18 +113,16 @@ class Api
      *
      * @return string
      */
-    public function createRequestUrl(array $data)
+    public function createRequestUrl(array $data): string
     {
         $this->ensureApiIsConfigured();
 
         $data = $this->createRequestData($data);
 
-        $url = $this->getUrl() . '?' .
-            implode('&', array_map(function ($key, $value) {
+        return $this->getUrl() . '?' .
+            implode('&', array_map(static function ($key, $value) {
                 return $key . '=' . rawurlencode($value);
             }, array_keys($data), $data));
-
-        return $url;
     }
 
     /**
@@ -123,15 +132,16 @@ class Api
      *
      * @return array
      */
-    public function createRequestData(array $data)
+    public function createRequestData(array $data): array
     {
         $data = $this
             ->getRequestOptionsResolver()
             ->resolve(array_replace($data, [
+                'vads_page_action' => 'PAYMENT',
                 'vads_version'     => 'V2',
             ]));
 
-        $data = array_filter($data, function ($value) {
+        $data = array_filter($data, static function ($value) {
             return null !== $value;
         });
 
@@ -150,7 +160,7 @@ class Api
      *
      * @return bool
      */
-    public function checkResponseIntegrity(array $data)
+    public function checkResponseIntegrity(array $data): bool
     {
         if (!isset($data['signature'])) {
             return false;
@@ -165,17 +175,17 @@ class Api
      * Generates the signature.
      *
      * @param array $data
-     * @param bool  $hashed
+     * @param bool $hashed
      *
      * @return string
      */
-    public function generateSignature(array $data, $hashed = true)
+    public function generateSignature(array $data, bool $hashed = true): string
     {
         ksort($data);
 
         $content = "";
         foreach ($data as $key => $value) {
-            if (substr($key, 0, 5) == 'vads_') {
+            if (strpos($key, 'vads_') === 0) {
                 $content .= $value . '+';
             }
         }
@@ -194,13 +204,13 @@ class Api
      *
      * @return string
      */
-    private function getDirectoryPath()
+    private function getDirectoryPath(): string
     {
         $path = $this->config['directory'];
 
         // Create directory if not exists
-        if (!is_dir($path)) {
-            mkdir($path, 0755, true);
+        if (!is_dir($path) && !mkdir($path, 0755, true) && !is_dir($path)) {
+            throw new RuntimeException('Failed to create cache directory');
         }
 
         return $path . DIRECTORY_SEPARATOR;
@@ -211,7 +221,7 @@ class Api
      *
      * @throws LogicException
      */
-    private function ensureApiIsConfigured()
+    private function ensureApiIsConfigured(): void
     {
         if (null === $this->config) {
             throw new LogicException('You must first configure the API.');
@@ -223,7 +233,7 @@ class Api
      *
      * @return OptionsResolver
      */
-    private function getConfigResolver()
+    private function getConfigResolver(): OptionsResolver
     {
         if (null !== $this->configResolver) {
             return $this->configResolver;
@@ -239,13 +249,15 @@ class Api
             ])
             ->setDefaults([
                 'endpoint' => null,
+                'hash_mode' => self::HASH_MODE_SHA256,
                 'debug'    => false,
             ])
             ->setAllowedTypes('site_id', 'string')
             ->setAllowedTypes('certificate', 'string')
-            ->setAllowedValues('ctx_mode', ['TEST', 'PRODUCTION'])
+            ->setAllowedValues('ctx_mode', $this->getModes())
             ->setAllowedTypes('directory', 'string')
             ->setAllowedValues('endpoint', $this->getEndPoints())
+            ->setAllowedValues('hash_mode', $this->getHashModes())
             ->setAllowedTypes('debug', 'bool')
             ->setNormalizer('directory', function (Options $options, $value) {
                 return rtrim($value, DIRECTORY_SEPARATOR);
@@ -259,7 +271,7 @@ class Api
      *
      * @return OptionsResolver
      */
-    private function getRequestOptionsResolver()
+    private function getRequestOptionsResolver(): OptionsResolver
     {
         if (null !== $this->requestOptionsResolver) {
             return $this->requestOptionsResolver;
@@ -276,6 +288,10 @@ class Api
                 'vads_card_options'             => null,
                 'vads_card_number'              => null,
                 'vads_contracts'                => function (Options $options) {
+                    /* TODO
+                    Obligatoire si le numéro de contrat commerçant à utiliser n’est pas celui configuré par défaut
+                    sur la plateforme de paiement
+                    */
                     return null;
                 },
                 'vads_contrib'                  => null,
@@ -284,6 +300,9 @@ class Api
                 'vads_cust_city'                => null,
                 'vads_cust_country'             => null,
                 'vads_cust_email'               => function (Options $options) {
+                    /* TODO
+                    Obligatoire si souscription à l'envoi d'e-mail de confirmation de paiement au client
+                    */
                     return null;
                 },
                 'vads_cust_id'                  => null,
@@ -309,6 +328,13 @@ class Api
                 'vads_redirect_success_timeout' => null,
                 'vads_return_get_params'        => null,
                 'vads_return_mode'              => function (Options $options) {
+                    /* TODO
+                    Obligatoire si souhait du commerçant de recevoir la réponse à la demande sur l’URL internet
+                    de retour boutique en formulaire GET ou POST (après clic internaute sur bouton retour
+                    boutique).
+                    Ce paramétrage n’impacte pas la transmission, ni les paramètres de transfert, de la réponse
+                    de serveur à serveur (URL serveur commerçant).
+                    */
                     return 'POST';
                 },
                 'vads_return_post_params'       => null,
@@ -397,19 +423,19 @@ class Api
             ->setAllowedValues('vads_version', 'V2');
 
         for ($index = 0; $index <= 100; $index++){
-            $resolver->setDefault("vads_product_ext_id{$index}",null);
-            $resolver->setDefault("vads_product_label{$index}",null);
-            $resolver->setDefault("vads_product_amount{$index}",null);
-            $resolver->setDefault("vads_product_type{$index}",null);
-            $resolver->setDefault("vads_product_ref{$index}",null);
-            $resolver->setDefault("vads_product_qty{$index}",null);
+            $resolver->setDefault("vads_product_ext_id$index",null);
+            $resolver->setDefault("vads_product_label$index",null);
+            $resolver->setDefault("vads_product_amount$index",null);
+            $resolver->setDefault("vads_product_type$index",null);
+            $resolver->setDefault("vads_product_ref$index",null);
+            $resolver->setDefault("vads_product_qty$index",null);
         }
 
 
         return $this->requestOptionsResolver = $resolver;
     }
 
-    private function getCurrencyCodes()
+    private function getCurrencyCodes(): array
     {
         return [
             '36', // Dollar australien
@@ -429,7 +455,7 @@ class Api
         ];
     }
 
-    private function getLanguageCodes()
+    private function getLanguageCodes(): array
     {
         return [
             null,
@@ -441,11 +467,11 @@ class Api
             'it', // Italien
             'jp', // Japonais
             'pt', // Portugais
-            'nl', // Néelandais
+            'nl', // Néerlandais
         ];
     }
 
-    private function getCardsCodes()
+    private function getCardsCodes(): array
     {
         return [
             null,
@@ -467,22 +493,41 @@ class Api
         ];
     }
 
-    private function getEndPoints()
+    private function getModes(): array
     {
-        return [null, 'SYSTEMPAY'];
+        return [self::MODE_TEST, self::MODE_PRODUCTION];
     }
 
-    private function getUrl()
+    private function getEndPoints(): array
     {
-        if ($this->config['endpoint'] === 'SYSTEMPAY') {
+        return [null, self::ENDPOINT_LYRA, self::ENDPOINT_SCELLIUS, self::ENDPOINT_SYSTEMPAY];
+    }
+
+    private function getHashModes(): array
+    {
+        return [self::HASH_MODE_SHA1, self::HASH_MODE_SHA256];
+    }
+
+    private function getUrl(): string
+    {
+        if (self::ENDPOINT_SYSTEMPAY === $this->config['endpoint']) {
             return 'https://paiement.systempay.fr/vads-payment/';
+        }
+
+        if (self::ENDPOINT_SCELLIUS === $this->config['endpoint']) {
+            return 'https://scelliuspaiement.labanquepostale.fr/vads-payment/';
+        }
+
+        if (self::ENDPOINT_LYRA === $this->config['endpoint']) {
+            return 'https://secure.lyra.com/vads-payment/';
         }
 
         return 'https://secure.payzen.eu/vads-payment/';
     }
 
-    private function hash(string $content) {
-        if ($this->config['endpoint'] === 'SYSTEMPAY') {
+    private function hash(string $content): string
+    {
+        if ($this->config['hash_mode'] === self::HASH_MODE_SHA1) {
             return sha1($content);
         }
 

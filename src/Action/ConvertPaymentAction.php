@@ -2,7 +2,6 @@
 
 namespace Akki\SyliusPayumPayzenPlugin\Action;
 
-
 use Sylius\Component\Core\Model\Customer;
 use Sylius\Component\Core\Model\PaymentInterface;
 use Payum\Core\Action\ActionInterface;
@@ -30,7 +29,7 @@ class ConvertPaymentAction implements ActionInterface, GatewayAwareInterface
      *
      * @param Convert $request
      */
-    public function execute($request)
+    public function execute($request): void
     {
         RequestNotSupportedException::assertSupports($this, $request);
 
@@ -56,18 +55,18 @@ class ConvertPaymentAction implements ActionInterface, GatewayAwareInterface
     /**
      * {@inheritDoc}
      */
-    public function supports($request)
+    public function supports($request): bool
     {
         return $request instanceof Convert
             && $request->getSource() instanceof PaymentInterface
-            && $request->getTo() == 'array';
+            && $request->getTo() === 'array';
     }
 
     /**
      * @param ArrayObject $model
      * @param PaymentInterface $payment
      */
-    protected function setAmount(ArrayObject $model, PaymentInterface $payment)
+    protected function setAmount(ArrayObject $model, PaymentInterface $payment): void
     {
         $this->gateway->execute($currency = new GetCurrency($payment->getCurrencyCode()));
 
@@ -91,7 +90,7 @@ class ConvertPaymentAction implements ActionInterface, GatewayAwareInterface
      * @param ArrayObject $model
      * @param PaymentInterface $payment
      */
-    protected function setDonneesCommande(ArrayObject $model, PaymentInterface $payment)
+    protected function setDonneesCommande(ArrayObject $model, PaymentInterface $payment): void
     {
         /** @var OrderInterface $order */
         $order = $payment->getOrder();
@@ -110,12 +109,12 @@ class ConvertPaymentAction implements ActionInterface, GatewayAwareInterface
         foreach (array_values($order->getItems()->toArray()) as $index => $orderItem){
             /** @var Product $product */
             $product = $orderItem->getProduct();
-            $model["vads_product_ext_id{$index}"] = $product->getSlug();
-            $model["vads_product_label{$index}"] = $this->specialChars($product->getName());
-            $model["vads_product_amount{$index}"] = $orderItem->getUnitPrice();
-            $model["vads_product_type{$index}"] = 'ENTERTAINMENT';
-            $model["vads_product_ref{$index}"] = $product->getCode();
-            $model["vads_product_qty{$index}"] = $orderItem->getQuantity();
+            $model["vads_product_ext_id$index"] = $product->getSlug();
+            $model["vads_product_label$index"] = $this->specialChars($product->getName());
+            $model["vads_product_amount$index"] = $orderItem->getUnitPrice();
+            $model["vads_product_type$index"] = 'ENTERTAINMENT';
+            $model["vads_product_ref$index"] = $product->getCode();
+            $model["vads_product_qty$index"] = $orderItem->getQuantity();
         }
     }
 
@@ -123,7 +122,7 @@ class ConvertPaymentAction implements ActionInterface, GatewayAwareInterface
      * @param ArrayObject $model
      * @param PaymentInterface $payment
      */
-    protected function setDonneesAcheteur(ArrayObject $model, PaymentInterface $payment)
+    protected function setDonneesAcheteur(ArrayObject $model, PaymentInterface $payment): void
     {
         $order = $payment->getOrder();
         /** @var Customer $customer */
@@ -163,9 +162,9 @@ class ConvertPaymentAction implements ActionInterface, GatewayAwareInterface
         }
     }
 
-    function specialChars($str)
+    private function specialChars($str)
     {
-        $translit = array(
+        $transliteration = array(
             'Á' => 'A', 'À' => 'A', 'Â' => 'A', 'Ä' => 'A', 'Ã' => 'A', 'Å' => 'A', 'Ç' => 'C', 'É' => 'E', 'È' => 'E', 'Ê' => 'E', 'Ë' => 'E', 'Í' => 'I', 'Ï' => 'I', 'Î' => 'I', 'Ì' => 'I', 'Ñ' => 'N', 'Ó' => 'O', 'Ò' => 'O', 'Ô' => 'O', 'Ö' => 'O', 'Õ' => 'O', 'Ú' => 'U', 'Ù' => 'U', 'Û' => 'U', 'Ü' => 'U', 'Ý' => 'Y', 'á' => 'a', 'à' => 'a', 'â' => 'a', 'ä' => 'a', 'ã' => 'a', 'å' => 'a', 'ç' => 'c', 'é' => 'e', 'è' => 'e', 'ê' => 'e', 'ë' => 'e', 'í' => 'i', 'ì' => 'i', 'î' => 'i', 'ï' => 'i', 'ñ' => 'n', 'ó' => 'o', 'ò' => 'o', 'ô' => 'o', 'ö' => 'o', 'õ' => 'o', 'ú' => 'u', 'ù' => 'u', 'û' => 'u', 'ü' => 'u', 'ý' => 'y', 'ÿ' => 'y',
             "\xC2\x82" => "'", // U+0082⇒U+201A single low-9 quotation mark
             "\xC2\x84" => '"', // U+0084⇒U+201E double low-9 quotation mark
@@ -190,7 +189,7 @@ class ConvertPaymentAction implements ActionInterface, GatewayAwareInterface
             "\xE2\x80\xB9" => "'", // U+2039 single left-pointing angle quotation mark
             "\xE2\x80\xBA" => "'",
         );
-        $strModified = strtr($str, $translit);
-        return preg_replace("/[^A-Za-z0-9 ]/", ' ', $strModified);;
+        $strModified = strtr($str, $transliteration);
+        return preg_replace("/[^A-Za-z0-9 ]/", ' ', $strModified);
     }
 }

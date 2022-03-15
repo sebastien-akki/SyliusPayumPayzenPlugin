@@ -19,21 +19,18 @@ class StatusAction implements ActionInterface
      *
      * @param GetStatusInterface $request
      */
-    public function execute($request)
+    public function execute($request): void
     {
         RequestNotSupportedException::assertSupports($this, $request);
 
-        /** @var GetStatusInterface $request */
-
         $model = ArrayObject::ensureArrayObject($request->getModel());
 
-        if (false == $model['vads_trans_id']) {
+        if (false === $model['vads_trans_id']) {
             $request->markNew();
-
             return;
         }
 
-        if (false != $code = $model['vads_result']) {
+        if (false !== $code = $model['vads_result']) {
             switch ($code) {
                 case "00" : // transaction approuvée ou traitée avec succès
                     $request->markCaptured();
@@ -81,21 +78,17 @@ class StatusAction implements ActionInterface
                     $request->markUnknown();
             }
 
-            if ($request->isCaptured() && false != $code = $model['state_override']) {
-                if ($code == 'refunded') {
-                    $request->markRefunded();
-                }
+            $code = $model['state_override'];
+            if ($code === 'refunded' && $request->isCaptured()) {
+                $request->markRefunded();
             }
-
             return;
         }
 
-        if (false != $code = $model['state_override']) {
-            if ($code == 'canceled') {
-                $request->markCanceled();
-
-                return;
-            }
+        $code = $model['state_override'];
+        if ($code === 'canceled') {
+            $request->markCanceled();
+            return;
         }
 
         $request->markNew();
@@ -104,7 +97,7 @@ class StatusAction implements ActionInterface
     /**
      * {@inheritdoc}
      */
-    public function supports($request)
+    public function supports($request): bool
     {
         return $request instanceof GetStatusInterface
             && $request->getModel() instanceof ArrayAccess;

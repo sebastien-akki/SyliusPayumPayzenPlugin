@@ -19,7 +19,9 @@ akki:
       debug:
         label: Debogage
     endpoint:
+      lyra: Lyra
       payzen: PayZen
+      scellius: Scellius
       systempay: SystemPay
     ctx_mode:
       production: Production

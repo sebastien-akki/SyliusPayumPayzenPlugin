@@ -19,7 +19,9 @@ akki:
       debug:
         label: traduction_missing
     endpoint:
+      lyra: traduction_missing
       payzen: traduction_missing
+      scellius: traduction_missing
       systempay: traduction_missing
     ctx_mode:
       production: traduction_missing

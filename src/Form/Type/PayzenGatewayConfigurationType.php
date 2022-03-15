@@ -2,6 +2,7 @@
 
 namespace Akki\SyliusPayumPayzenPlugin\Form\Type;
 
+use Akki\SyliusPayumPayzenPlugin\Api\Api;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -11,23 +12,20 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 final class PayzenGatewayConfigurationType extends AbstractType
 {
 
-    private const MODE_PRODUCTION = 'PRODUCTION';
-    private const MODE_TEST = 'TEST';
-    private const ENDPOINT_PAYZEN = null;
-    private const ENDPOINT_SYSTEMPAY = 'SYSTEMPAY';
-
     /**
      * {@inheritdoc}
      */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
             ->add('endpoint', ChoiceType::class, [
                 'label' => 'akki.payzen.fields.endpoint.label',
                 'help' => 'akki.payzen.fields.endpoint.help',
                 'choices' => [
-                    'akki.payzen.endpoint.payzen' => self::ENDPOINT_PAYZEN,
-                    'akki.payzen.endpoint.systempay' => self::ENDPOINT_SYSTEMPAY
+                    'akki.payzen.endpoint.lyra' => Api::ENDPOINT_LYRA,
+                    'akki.payzen.endpoint.payzen' => Api::ENDPOINT_PAYZEN,
+                    'akki.payzen.endpoint.scellius' => Api::ENDPOINT_SCELLIUS,
+                    'akki.payzen.endpoint.systempay' => Api::ENDPOINT_SYSTEMPAY,
                 ],
             ])
             ->add('site_id', TextType::class, [
@@ -52,8 +50,8 @@ final class PayzenGatewayConfigurationType extends AbstractType
             ->add('ctx_mode', ChoiceType::class, [
                 'label' => 'akki.payzen.fields.ctx_mode.label',
                 'choices' => [
-                    'akki.payzen.ctx_mode.production' => self::MODE_PRODUCTION,
-                    'akki.payzen.ctx_mode.test' => self::MODE_TEST
+                    'akki.payzen.ctx_mode.production' => Api::MODE_PRODUCTION,
+                    'akki.payzen.ctx_mode.test' => Api::MODE_TEST
                 ],
             ])
             ->add('directory', TextType::class, [

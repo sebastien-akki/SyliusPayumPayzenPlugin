@@ -13,5 +13,5 @@ interface ResourceExceptionInterface
      *
      * @return string
      */
-    public function getMessage();
+    public function getMessage(): string;
 }

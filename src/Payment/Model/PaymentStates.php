@@ -2,7 +2,6 @@
 
 namespace Akki\SyliusPayumPayzenPlugin\Payment\Model;
 
-
 use Akki\SyliusPayumPayzenPlugin\Exception\InvalidArgumentException;
 
 /**
@@ -11,21 +10,21 @@ use Akki\SyliusPayumPayzenPlugin\Exception\InvalidArgumentException;
  */
 final class PaymentStates
 {
-    const STATE_NEW         = 'new';
-    const STATE_PENDING     = 'pending';
-    const STATE_CAPTURED    = 'captured';
-    const STATE_FAILED      = 'failed';
-    const STATE_CANCELED    = 'canceled';
-    const STATE_REFUNDED    = 'refunded';
-    const STATE_AUTHORIZED  = 'authorized';
-    const STATE_SUSPENDED   = 'suspended';
-    const STATE_EXPIRED     = 'expired';
-    const STATE_UNKNOWN     = 'unknown';
+    public const STATE_NEW         = 'new';
+    public const STATE_PENDING     = 'pending';
+    public const STATE_CAPTURED    = 'captured';
+    public const STATE_FAILED      = 'failed';
+    public const STATE_CANCELED    = 'canceled';
+    public const STATE_REFUNDED    = 'refunded';
+    public const STATE_AUTHORIZED  = 'authorized';
+    public const STATE_SUSPENDED   = 'suspended';
+    public const STATE_EXPIRED     = 'expired';
+    public const STATE_UNKNOWN     = 'unknown';
 
     // For sale
-    const STATE_OUTSTANDING = 'outstanding';
-    const STATE_DEPOSIT     = 'deposit';
-    const STATE_COMPLETED   = 'completed';
+    public const STATE_OUTSTANDING = 'outstanding';
+    public const STATE_DEPOSIT     = 'deposit';
+    public const STATE_COMPLETED   = 'completed';
 
 
     /**
@@ -33,36 +32,36 @@ final class PaymentStates
      *
      * @return array
      */
-    static public function getStates()
+    public static function getStates(): array
     {
         return [
-            static::STATE_NEW,
-            static::STATE_PENDING,
-            static::STATE_CAPTURED,
-            static::STATE_FAILED,
-            static::STATE_CANCELED,
-            static::STATE_REFUNDED,
-            static::STATE_AUTHORIZED,
-            static::STATE_SUSPENDED,
-            static::STATE_EXPIRED,
-            static::STATE_UNKNOWN,
-            static::STATE_OUTSTANDING,
-            static::STATE_DEPOSIT,
-            static::STATE_COMPLETED,
+            self::STATE_NEW,
+            self::STATE_PENDING,
+            self::STATE_CAPTURED,
+            self::STATE_FAILED,
+            self::STATE_CANCELED,
+            self::STATE_REFUNDED,
+            self::STATE_AUTHORIZED,
+            self::STATE_SUSPENDED,
+            self::STATE_EXPIRED,
+            self::STATE_UNKNOWN,
+            self::STATE_OUTSTANDING,
+            self::STATE_DEPOSIT,
+            self::STATE_COMPLETED,
         ];
     }
 
     /**
-     * Returns whether or not the given state is valid.
+     * Returns whether the given state is valid.
      *
      * @param string $state
-     * @param bool   $throwException
+     * @param bool $throwException
      *
      * @return bool
      */
-    static public function isValidState($state, $throwException = true)
+    public static function isValidState(string $state, bool $throwException = true): bool
     {
-        if (in_array($state, static::getStates(), true)) {
+        if (in_array($state, self::getStates(), true)) {
             return true;
         }
 
@@ -78,27 +77,27 @@ final class PaymentStates
      *
      * @return array
      */
-    static public function getNotifiableStates()
+    public static function getNotifiableStates(): array
     {
         return [
-            static::STATE_PENDING,
-            static::STATE_CAPTURED,
-            static::STATE_AUTHORIZED,
-            static::STATE_FAILED,
-            static::STATE_REFUNDED,
+            self::STATE_PENDING,
+            self::STATE_CAPTURED,
+            self::STATE_AUTHORIZED,
+            self::STATE_FAILED,
+            self::STATE_REFUNDED,
         ];
     }
 
     /**
-     * Returns whether or not the given state is a notifiable state.
+     * Returns whether the given state is a notifiable state.
      *
      * @param string $state
      *
      * @return bool
      */
-    static public function isNotifiableState($state)
+    public static function isNotifiableState(string $state): bool
     {
-        return in_array($state, static::getNotifiableStates(), true);
+        return in_array($state, self::getNotifiableStates(), true);
     }
 
     /**
@@ -106,25 +105,25 @@ final class PaymentStates
      *
      * @return array
      */
-    static public function getDeletableStates()
+    public static function getDeletableStates(): array
     {
         return [
-            static::STATE_NEW,
-            static::STATE_CANCELED,
-            static::STATE_FAILED,
+            self::STATE_NEW,
+            self::STATE_CANCELED,
+            self::STATE_FAILED,
         ];
     }
 
     /**
-     * Returns whether or not the given state is a deletable state.
+     * Returns whether the given state is a deletable state.
      *
-     * @param string $state
+     * @param string|null $state
      *
      * @return bool
      */
-    static public function isDeletableState($state)
+    public static function isDeletableState(?string $state): bool
     {
-        return is_null($state) || in_array($state, static::getDeletableStates(), true);
+        return is_null($state) || in_array($state, self::getDeletableStates(), true);
     }
 
     /**
@@ -132,24 +131,24 @@ final class PaymentStates
      *
      * @return array
      */
-    static public function getPaidStates()
+    public static function getPaidStates(): array
     {
         return [
-            static::STATE_CAPTURED,
-            static::STATE_AUTHORIZED,
+            self::STATE_CAPTURED,
+            self::STATE_AUTHORIZED,
         ];
     }
 
     /**
-     * Returns whether or not the given state is a paid state.
+     * Returns whether the given state is a paid state.
      *
      * @param string $state
      *
      * @return bool
      */
-    static public function isPaidState($state)
+    public static function isPaidState(string $state): bool
     {
-        return in_array($state, static::getPaidStates(), true);
+        return in_array($state, self::getPaidStates(), true);
     }
 
     /**
@@ -157,47 +156,47 @@ final class PaymentStates
      *
      * @return array
      */
-    static public function getCanceledStates()
+    public static function getCanceledStates(): array
     {
         return [
-            static::STATE_CANCELED,
-            static::STATE_FAILED,
-            static::STATE_REFUNDED,
+            self::STATE_CANCELED,
+            self::STATE_FAILED,
+            self::STATE_REFUNDED,
         ];
     }
 
     /**
-     * Returns whether or not the state has changed
+     * Returns whether the state has changed
      * from a non paid state to a paid state.
      *
      * @param array $cs The persistence change set
      *
      * @return bool
      */
-    static public function hasChangedToPaid(array $cs)
+    public static function hasChangedToPaid(array $cs): bool
     {
-        return static::assertValidChangeSet($cs)
-            && !static::isPaidState($cs[0])
-            && static::isPaidState($cs[1]);
+        return self::assertValidChangeSet($cs)
+            && !self::isPaidState($cs[0])
+            && self::isPaidState($cs[1]);
     }
 
     /**
-     * Returns whether or not the state has changed
+     * Returns whether the state has changed
      * from a paid state to a non paid state.
      *
      * @param array $cs The persistence change set
      *
      * @return bool
      */
-    static public function hasChangedFromPaid(array $cs)
+    public static function hasChangedFromPaid(array $cs): bool
     {
-        return static::assertValidChangeSet($cs)
-            && static::isPaidState($cs[0])
-            && !static::isPaidState($cs[1]);
+        return self::assertValidChangeSet($cs)
+            && self::isPaidState($cs[0])
+            && !self::isPaidState($cs[1]);
     }
 
     /**
-     * Returns whether or not the change set is valid.
+     * Returns whether the change set is valid.
      *
      * @param array $cs
      *
@@ -205,26 +204,17 @@ final class PaymentStates
      *
      * @throws InvalidArgumentException
      */
-    static private function assertValidChangeSet(array $cs)
+    private static function assertValidChangeSet(array $cs): bool
     {
         if (
             array_key_exists(0, $cs) &&
             array_key_exists(1, $cs) &&
-            (is_null($cs[0]) || in_array($cs[0], static::getStates(), true)) &&
-            (is_null($cs[1]) || in_array($cs[1], static::getStates(), true))
+            (is_null($cs[0]) || in_array($cs[0], self::getStates(), true)) &&
+            (is_null($cs[1]) || in_array($cs[1], self::getStates(), true))
         ) {
             return true;
         }
 
         throw new InvalidArgumentException("Unexpected order state change set.");
-    }
-
-    /**
-     * Disabled constructor.
-     *
-     * @codeCoverageIgnore
-     */
-    final private function __construct()
-    {
     }
 }

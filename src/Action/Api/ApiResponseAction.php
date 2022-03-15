@@ -17,7 +17,7 @@ class ApiResponseAction extends AbstractApiAction
     /**
      * @inheritdoc
      */
-    public function execute($request)
+    public function execute($request): void
     {
         /** @var Response $request */
         RequestNotSupportedException::assertSupports($this, $request);
@@ -37,7 +37,7 @@ class ApiResponseAction extends AbstractApiAction
         $this->logResponseData($data);
 
         // Check amount
-        if ($model['vads_amount'] != $data['vads_amount']) {
+        if ($model['vads_amount'] !== $data['vads_amount']) {
             return;
         }
 
@@ -54,7 +54,7 @@ class ApiResponseAction extends AbstractApiAction
      *
      * @param array $data
      */
-    private function logResponseData(array $data)
+    private function logResponseData(array $data): void
     {
         $this->logData("[Payzen] Response", $data, [
             'vads_order_id',
@@ -75,7 +75,7 @@ class ApiResponseAction extends AbstractApiAction
      * @param $request
      * @return bool
      */
-    public function supports($request)
+    public function supports($request): bool
     {
         return $request instanceof Response
             && $request->getModel() instanceof ArrayAccess;

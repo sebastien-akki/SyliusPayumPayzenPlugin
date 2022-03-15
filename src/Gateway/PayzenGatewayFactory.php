@@ -25,12 +25,12 @@ class PayzenGatewayFactory extends GatewayFactory
     /**
      * Builds a new factory.
      *
-     * @param array                   $defaultConfig
-     * @param GatewayFactoryInterface $coreGatewayFactory
+     * @param array $defaultConfig
+     * @param GatewayFactoryInterface|null $coreGatewayFactory
      *
      * @return PayzenGatewayFactory
      */
-    public static function build(array $defaultConfig, GatewayFactoryInterface $coreGatewayFactory = null)
+    public static function build(array $defaultConfig, GatewayFactoryInterface $coreGatewayFactory = null): PayzenGatewayFactory
     {
         return new static($defaultConfig, $coreGatewayFactory);
     }
@@ -38,7 +38,7 @@ class PayzenGatewayFactory extends GatewayFactory
     /**
      * @inheritDoc
      */
-    protected function populateConfig(ArrayObject $config)
+    protected function populateConfig(ArrayObject $config): void
     {
         $config->defaults([
             'payum.factory_name'  => 'payzen',
@@ -55,13 +55,14 @@ class PayzenGatewayFactory extends GatewayFactory
             'payum.action.api.response'    => new ApiResponseAction(),
         ]);
 
-        if (false == $config['payum.api']) {
+        if (false === $config['payum.api']) {
             $config['payum.default_options'] = [
                 'site_id'     => null,
                 'certificate' => null,
                 'ctx_mode'    => null,
                 'directory'   => null,
                 'endpoint'    => null,
+                'hash_mode'   => Api::HASH_MODE_SHA256,
                 'debug'       => false,
             ];
 
@@ -69,7 +70,7 @@ class PayzenGatewayFactory extends GatewayFactory
 
             $config['payum.required_options'] = ['site_id', 'certificate', 'ctx_mode', 'directory'];
 
-            $config['payum.api'] = function (ArrayObject $config) {
+            $config['payum.api'] = static function (ArrayObject $config) {
                 $config->validateNotEmpty($config['payum.required_options']);
 
                 $payzenConfig = [
@@ -78,6 +79,7 @@ class PayzenGatewayFactory extends GatewayFactory
                     'certificate' => $config['certificate'],
                     'ctx_mode'    => $config['ctx_mode'],
                     'directory'   => $config['directory'],
+                    'hash_mode'   => $config['hash_mode'],
                     'debug'       => $config['debug'],
                 ];
 
