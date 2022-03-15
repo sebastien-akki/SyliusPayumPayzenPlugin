@@ -500,7 +500,7 @@ class Api
 
     private function getEndPoints(): array
     {
-        return [null, self::ENDPOINT_LYRA, self::ENDPOINT_SCELLIUS, self::ENDPOINT_SYSTEMPAY];
+        return [null, self::ENDPOINT_LYRA, self::ENDPOINT_PAYZEN, self::ENDPOINT_SCELLIUS, self::ENDPOINT_SYSTEMPAY];
     }
 
     private function getHashModes(): array
