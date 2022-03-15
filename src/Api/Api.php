@@ -29,12 +29,12 @@ class Api
     /**
      * @var OptionsResolver|null
      */
-    private ?OptionsResolver $configResolver;
+    private $configResolver;
 
     /**
      * @var OptionsResolver|null
      */
-    private ?OptionsResolver $requestOptionsResolver;
+    private $requestOptionsResolver;
 
     /**
      * @var array

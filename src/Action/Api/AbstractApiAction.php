@@ -22,12 +22,12 @@ abstract class AbstractApiAction implements ActionInterface, GatewayAwareInterfa
     /**
      * @var Api|null
      */
-    protected ?Api $api;
+    protected $api;
 
     /**
      * @var LoggerInterface|null
      */
-    private ?LoggerInterface $logger;
+    private $logger;
 
 
     /**
