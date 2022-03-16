@@ -41,6 +41,27 @@ class Api
      */
     private $config;
 
+    /**
+     * @param $endpoint
+     * @return string
+     */
+    public static function getUrlFromEndpoint($endpoint): string
+    {
+        if (self::ENDPOINT_SYSTEMPAY === $endpoint) {
+            return 'https://paiement.systempay.fr/vads-payment/';
+        }
+
+        if (self::ENDPOINT_SCELLIUS === $endpoint) {
+            return 'https://scelliuspaiement.labanquepostale.fr/vads-payment/';
+        }
+
+        if (self::ENDPOINT_LYRA === $endpoint) {
+            return 'https://secure.lyra.com/vads-payment/';
+        }
+
+        return 'https://secure.payzen.eu/vads-payment/';
+    }
+
 
     /**
      * Configures the api.
@@ -510,19 +531,8 @@ class Api
 
     private function getUrl(): string
     {
-        if (self::ENDPOINT_SYSTEMPAY === $this->config['endpoint']) {
-            return 'https://paiement.systempay.fr/vads-payment/';
-        }
-
-        if (self::ENDPOINT_SCELLIUS === $this->config['endpoint']) {
-            return 'https://scelliuspaiement.labanquepostale.fr/vads-payment/';
-        }
-
-        if (self::ENDPOINT_LYRA === $this->config['endpoint']) {
-            return 'https://secure.lyra.com/vads-payment/';
-        }
-
-        return 'https://secure.payzen.eu/vads-payment/';
+        $endpoint = $this->config['endpoint'];
+        return self::getUrlFromEndpoint($endpoint);
     }
 
     private function hash(string $content): string
