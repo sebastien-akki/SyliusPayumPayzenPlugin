@@ -158,7 +158,7 @@ class Api
         $data = $this
             ->getRequestOptionsResolver()
             ->resolve(array_replace($data, [
-                'vads_page_action' => 'PAYMENT',
+//                'vads_page_action' => 'PAYMENT',
                 'vads_version'     => 'V2',
             ]));
 
