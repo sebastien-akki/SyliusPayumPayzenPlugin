@@ -95,9 +95,9 @@ class ConvertPaymentAction implements ActionInterface, GatewayAwareInterface
         /** @var OrderInterface $order */
         $order = $payment->getOrder();
 
-        $model['vads_order_id'] = $order->getId();
+        $model['vads_order_id'] = $order->getNumber();
 
-        $comment = "Order: {$order->getNumber()}";
+        $comment = "Order ID: {$order->getId()}";
         if (null !== $customer = $order->getCustomer()) {
             $comment .= ", Customer: {$customer->getId()}";
         }
