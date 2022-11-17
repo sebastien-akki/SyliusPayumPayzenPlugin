@@ -74,10 +74,11 @@ class ConvertPaymentAction implements ActionInterface, GatewayAwareInterface
         $order = $payment->getOrder();
 
         $hasOffresADL = $order->hasOffresADL();
+        $hasOffresATR = $order->hasOffresATR();
         $amount = $order->getTotal() - $order->montantProductsOffresADL();
 
         if ($amount > 0){
-            $model['vads_page_action'] = $hasOffresADL ? 'REGISTER_PAY' : 'PAYMENT';
+            $model['vads_page_action'] = $hasOffresADL || $hasOffresATR ? 'REGISTER_PAY' : 'PAYMENT';
             $model['vads_amount'] = (string)$amount;
             $model['vads_currency'] = $currency->numeric;
             $model['vads_payment_config'] = 'SINGLE';
