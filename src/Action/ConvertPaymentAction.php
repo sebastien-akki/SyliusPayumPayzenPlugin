@@ -84,6 +84,7 @@ class ConvertPaymentAction implements ActionInterface, GatewayAwareInterface
             $model['vads_payment_config'] = 'SINGLE';
         }else {
             $model['vads_page_action'] = 'REGISTER';
+            $model['vads_amount'] = (string)$amount;
         }
     }
 

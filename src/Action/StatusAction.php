@@ -6,14 +6,20 @@ use ArrayAccess;
 use Payum\Core\Action\ActionInterface;
 use Payum\Core\Bridge\Spl\ArrayObject;
 use Payum\Core\Exception\RequestNotSupportedException;
+use Payum\Core\GatewayAwareInterface;
+use Payum\Core\GatewayAwareTrait;
 use Payum\Core\Request\GetStatusInterface;
+use Payum\Core\Request\Sync;
 
 /**
  * Class StatusAction
  * @package Akki\SyliusPayumPayzenPlugin\Action
  */
-class StatusAction implements ActionInterface
+class StatusAction implements ActionInterface, GatewayAwareInterface
 {
+
+    use GatewayAwareTrait;
+    
     /**
      * {@inheritdoc}
      *
@@ -29,6 +35,8 @@ class StatusAction implements ActionInterface
             $request->markNew();
             return;
         }
+
+        $this->gateway->execute(new Sync($model));
 
         if (false != $code = $model['vads_result']) {
             switch ($code) {

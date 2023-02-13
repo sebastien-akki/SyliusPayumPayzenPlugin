@@ -31,12 +31,10 @@ class ApiRequestAction extends AbstractApiAction
         $model = ArrayObject::ensureArrayObject($request->getModel());
 
         if ($model['vads_trans_id']) {
-            return;
+            $model['vads_trans_id'] = $this->api->getTransactionId();
+            // Current UTC date time
+            $model['vads_trans_date'] = (new DateTime('now', new DateTimeZone('UTC')))->format('YmdHis');
         }
-
-        $model['vads_trans_id'] = $this->api->getTransactionId();
-        // Current UTC date time
-        $model['vads_trans_date'] = (new DateTime('now', new DateTimeZone('UTC')))->format('YmdHis');
 
         $data = $model->getArrayCopy();
 

@@ -36,11 +36,6 @@ class ApiResponseAction extends AbstractApiAction
 
         $this->logResponseData($data);
 
-        // Check amount
-        if ($model['vads_amount'] !== $data['vads_amount']) {
-            return;
-        }
-
         // Check the response signature
         if ($this->api->checkResponseIntegrity($data)) {
             // Update the payment details
