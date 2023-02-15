@@ -10,3 +10,10 @@ services:
         arguments: [Akki\SyliusPayumPayzenPlugin\Gateway\PayzenGatewayFactory]
         tags:
             - { name: payum.gateway_factory_builder, factory: payzen }
+
+    akki.payzen.extension.from_foreign_gateway:
+        public: true
+        class: Akki\SyliusPayumPayzenPlugin\Extension\FromForeignGatewayExtension
+        tags:
+            - name: payum.extension
+              factory: payzen
