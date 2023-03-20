@@ -45,13 +45,13 @@ final class FromForeignGatewayExtension implements ExtensionInterface
 
         $found = false;
         foreach ($details as $key => $value) {
-            if (0 !== strpos($key, self::VADS) ) {
+            if (0 === strpos($key, self::VADS)) {
                 $found = true;
             }
         }
 
         // Reset the details we are coming from a foreign gateway
-        if (true === $found) {
+        if (false === $found) {
             $paiement->setDetails([]);
         }
     }

@@ -6,20 +6,14 @@ use ArrayAccess;
 use Payum\Core\Action\ActionInterface;
 use Payum\Core\Bridge\Spl\ArrayObject;
 use Payum\Core\Exception\RequestNotSupportedException;
-use Payum\Core\GatewayAwareInterface;
-use Payum\Core\GatewayAwareTrait;
 use Payum\Core\Request\GetStatusInterface;
-use Payum\Core\Request\Sync;
 
 /**
  * Class StatusAction
  * @package Akki\SyliusPayumPayzenPlugin\Action
  */
-class StatusAction implements ActionInterface, GatewayAwareInterface
+class StatusAction implements ActionInterface
 {
-
-    use GatewayAwareTrait;
-    
     /**
      * {@inheritdoc}
      *
@@ -33,10 +27,9 @@ class StatusAction implements ActionInterface, GatewayAwareInterface
 
         if (false == $model['vads_trans_id']) {
             $request->markNew();
+
             return;
         }
-
-        $this->gateway->execute(new Sync($model));
 
         if (false != $code = $model['vads_result']) {
             switch ($code) {
@@ -86,17 +79,21 @@ class StatusAction implements ActionInterface, GatewayAwareInterface
                     $request->markUnknown();
             }
 
-            $code = $model['state_override'];
-            if ($code === 'refunded' && $request->isCaptured()) {
-                $request->markRefunded();
+            if ($request->isCaptured() && false != $code = $model['state_override']) {
+                if ($code == 'refunded') {
+                    $request->markRefunded();
+                }
             }
+
             return;
         }
 
-        $code = $model['state_override'];
-        if ($code === 'canceled') {
-            $request->markCanceled();
-            return;
+        if (false != $code = $model['state_override']) {
+            if ($code == 'canceled') {
+                $request->markCanceled();
+
+                return;
+            }
         }
 
         $request->markNew();
