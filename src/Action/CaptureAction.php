@@ -37,7 +37,7 @@ class CaptureAction implements ActionInterface, GatewayAwareInterface, GenericTo
         if (false == $model['vads_trans_id']) {
             if ($request->getToken()) {
                 // Done redirections
-                $targetUrl = $request->getToken()->getAfterUrl();
+                $targetUrl = $request->getToken()->getTargetUrl();
                 $doneUrlFields = [
                     'vads_url_cancel',   // Annuler et retourner à la boutique
                     'vads_url_error',    // Erreur de traitement interne
