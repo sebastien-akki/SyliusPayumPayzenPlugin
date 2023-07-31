@@ -43,17 +43,17 @@ final class FromForeignGatewayExtension implements ExtensionInterface
             return;
         }
 
-        $found = false;
-        foreach ($details as $key => $value) {
-            if (0 === strpos($key, self::VADS)) {
-                $found = true;
-            }
-        }
+//        $found = false;
+//        foreach ($details as $key => $value) {
+//            if (0 === strpos($key, self::VADS)) {
+//                $found = true;
+//            }
+//        }
 
         // Reset the details we are coming from a foreign gateway
-        if (false === $found) {
+//        if (false === $found) {
             $paiement->setDetails([]);
-        }
+//        }
     }
 
     public function onPostExecute(Context $context): void
