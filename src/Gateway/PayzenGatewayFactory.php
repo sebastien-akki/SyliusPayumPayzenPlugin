@@ -4,6 +4,7 @@ namespace Akki\SyliusPayumPayzenPlugin\Gateway;
 
 use Akki\SyliusPayumPayzenPlugin\Action\Api\ApiRequestAction;
 use Akki\SyliusPayumPayzenPlugin\Action\Api\ApiResponseAction;
+use Akki\SyliusPayumPayzenPlugin\Action\Api\ValidatePaymentAction;
 use Akki\SyliusPayumPayzenPlugin\Action\CancelAction;
 use Akki\SyliusPayumPayzenPlugin\Action\CaptureAction;
 use Akki\SyliusPayumPayzenPlugin\Action\ConvertPaymentAction;
@@ -53,6 +54,7 @@ class PayzenGatewayFactory extends GatewayFactory
             'payum.action.notify'          => new NotifyAction(),
             'payum.action.api.request'     => new ApiRequestAction(),
             'payum.action.api.response'    => new ApiResponseAction(),
+            'payum.action.api.validate_payment' => new ValidatePaymentAction()
         ]);
 
         if (false == $config['payum.api']) {
@@ -64,11 +66,15 @@ class PayzenGatewayFactory extends GatewayFactory
                 'endpoint'    => null,
                 'hash_mode'   => Api::HASH_MODE_SHA256,
                 'debug'       => false,
+                'password'    => null,
+                'sha256key'   => null,
+                'public_key'  => null,
+                'ipn'         => null,
             ];
 
             $config->defaults($config['payum.default_options']);
 
-            $config['payum.required_options'] = ['site_id', 'certificate', 'ctx_mode', 'directory'];
+            $config['payum.required_options'] = ['site_id', 'certificate', 'ctx_mode', 'directory', 'password', 'sha256key', 'public_key', 'ipn'];
 
             $config['payum.api'] = static function (ArrayObject $config) {
                 $config->validateNotEmpty($config['payum.required_options']);
@@ -81,6 +87,10 @@ class PayzenGatewayFactory extends GatewayFactory
                     'directory'   => $config['directory'],
                     'hash_mode'   => $config['hash_mode'],
                     'debug'       => $config['debug'],
+                    'password'    => $config['password'],
+                    'sha256key'   => $config['sha256key'],
+                    'public_key'  => $config['public_key'],
+                    'ipn'         => $config['ipn'],
                 ];
 
                 $api = new Api();

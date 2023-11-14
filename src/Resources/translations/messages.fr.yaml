@@ -18,6 +18,18 @@ akki:
         label: Répertoire de gestion de transaction
       debug:
         label: Debogage
+      password:
+        label: Password API
+        help: a renseigner pour les embedded fields
+      sha256key:
+        label: SHA 256 Key API
+        help: a renseigner pour les embedded fields
+      public_key:
+        label: Clé publique
+        help: a renseigner pour les embedded fields
+      ipn:
+        label: Clé publique
+        help: a renseigner pour les embedded fields
     endpoint:
       lyra: Lyra
       payzen: PayZen

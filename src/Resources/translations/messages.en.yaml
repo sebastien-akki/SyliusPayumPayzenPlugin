@@ -18,6 +18,18 @@ akki:
         label: traduction_missing
       debug:
         label: traduction_missing
+      password:
+        label: traduction_missing
+        help: traduction_missing
+      sha256key:
+        label: traduction_missing
+        help: traduction_missing
+      public_key:
+        label: traduction_missing
+        help: traduction_missing
+      ipn:
+        label: traduction_missing
+        help: traduction_missing
     endpoint:
       lyra: traduction_missing
       payzen: traduction_missing

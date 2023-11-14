@@ -17,3 +17,15 @@ services:
         tags:
             - name: payum.extension
               factory: payzen
+
+    Akki\SyliusPayumPayzenPlugin\StateMachine\AbstractOrderProcessor:
+        abstract: true
+        arguments:
+            $payum: '@payum'
+
+    akki.sylius_payum_lyra.state_machine.validate_payment:
+        public: true
+        parent: Akki\SyliusPayumPayzenPlugin\StateMachine\AbstractOrderProcessor
+        class: Akki\SyliusPayumPayzenPlugin\StateMachine\ValidatePaymentOrderProcessor
+        arguments:
+            $smFactory: '@sm.factory'

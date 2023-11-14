@@ -8,7 +8,8 @@
     "php-http/guzzle6-adapter": "^1.1|~2.0",
     "psr/log": "~1.0",
     "sylius/sylius": "~1.7|~1.5",
-    "symfony/process": "~2.7|~3.0|~4.0"
+    "symfony/process": "~2.7|~3.0|~4.0",
+    "lyracom/rest-php-sdk": "^4.0"
   },
   "license": "MIT",
   "authors": [

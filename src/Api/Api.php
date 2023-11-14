@@ -4,8 +4,16 @@ namespace Akki\SyliusPayumPayzenPlugin\Api;
 
 use DateTime;
 use Exception;
+use Lyra\Client;
+use Lyra\Exceptions\LyraException;
 use Payum\Core\Exception\LogicException;
 use Payum\Core\Exception\RuntimeException;
+use Payum\Core\ISO4217\Currency;
+use Sylius\Component\Core\Model\Customer;
+use Sylius\Component\Core\Model\Order;
+use Sylius\Component\Core\Model\OrderItemInterface;
+use Sylius\Component\Core\Model\PaymentInterface;
+use Sylius\Component\Core\Model\Product;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -60,6 +68,48 @@ class Api
         }
 
         return 'https://secure.payzen.eu/vads-payment/';
+    }
+
+    /**
+     * @param $endpoint
+     * @return string
+     */
+    public static function getUrlApiFromEndpoint($endpoint): string
+    {
+        if (self::ENDPOINT_SYSTEMPAY === $endpoint) {
+            return 'https://api.systempay.fr';
+        }
+
+        if (self::ENDPOINT_SCELLIUS === $endpoint) {
+            return 'https://api.scelliuspaiement.labanquepostale.fr';
+        }
+
+        if (self::ENDPOINT_LYRA === $endpoint) {
+            return 'https://api.lyra.com';
+        }
+
+        return 'https://api.payzen.eu';
+    }
+
+    /**
+     * @param $endpoint
+     * @return string
+     */
+    public static function getClientUrlApiFromEndpoint($endpoint): string
+    {
+        if (self::ENDPOINT_SYSTEMPAY === $endpoint) {
+            return 'https://static.systempay.fr';
+        }
+
+        if (self::ENDPOINT_SCELLIUS === $endpoint) {
+            return 'https://static.scelliuspaiement.labanquepostale.fr';
+        }
+
+        if (self::ENDPOINT_LYRA === $endpoint) {
+            return 'https://static.lyra.com';
+        }
+
+        return 'https://static.payzen.eu';
     }
 
 
@@ -267,6 +317,9 @@ class Api
                 'certificate',
                 'ctx_mode',
                 'directory',
+                'password',
+                'sha256key',
+                'public_key',
             ])
             ->setDefaults([
                 'endpoint' => null,
@@ -275,6 +328,9 @@ class Api
             ])
             ->setAllowedTypes('site_id', 'string')
             ->setAllowedTypes('certificate', 'string')
+            ->setAllowedTypes('password', 'string')
+            ->setAllowedTypes('sha256key', 'string')
+            ->setAllowedTypes('public_key', 'string')
             ->setAllowedValues('ctx_mode', $this->getModes())
             ->setAllowedTypes('directory', 'string')
             ->setAllowedValues('endpoint', $this->getEndPoints())
@@ -542,5 +598,296 @@ class Api
         }
 
         return base64_encode(hash_hmac('sha256', $content, $this->config['certificate'], true));
+    }
+
+    /**
+     * @return Client
+     */
+    public function getLyraClient(): Client
+    {
+
+        $this->ensureApiIsConfigured();
+        $client = new Client();
+        $client->setUsername($this->config['site_id']);
+        $client->setPassword($this->config['password']);
+        $client->setEndpoint(self::getUrlApiFromEndpoint($this->config['endpoint']));
+        $client->setPublicKey($this->config['public_key']);
+        $client->setClientEndpoint(self::getClientUrlApiFromEndpoint($this->config['endpoint']));
+        $client->setSHA256Key($this->config['sha256key']);
+
+        return $client;
+    }
+
+    /**
+     * @param Order $order
+     *
+     * @return array|null
+     *
+     * @throws LyraException
+     */
+    public function getFormToken(Order $order): ?array
+    {
+        $payment = $order->getLastPayment();
+
+        if (!($payment instanceof PaymentInterface)) {
+            return null;
+        }
+
+        //Si on n'arrive pas à annuler le paiement, on ne fait rien. On peut quand même récupérer le token.
+        try {
+            $this->cancelPayment($payment);
+        } catch (LyraException $exception) {}
+
+        $responseCreateOrder = $this->createOrder($order);
+
+        if ($responseCreateOrder) {
+            return $responseCreateOrder;
+        }
+
+        return null;
+    }
+
+    /**
+     * @param string|null $uuid
+     * @return mixed|null
+     * @throws LyraException
+     */
+    public function readOrder(?string $uuid)
+    {
+        if ($uuid !== null) {
+            $datas['uuid'] = $uuid;
+            return $this->getLyraClient()->post("V4/Transaction/Get", $datas);
+        }
+
+        return null;
+    }
+
+    /**
+     * @param Order $order
+     * @return array
+     *
+     * @throws LyraException
+     */
+    public function createOrder(Order $order): array
+    {
+        $client = $this->getLyraClient();
+
+        $amount = $order->getTotal() - $order->montantProductsOffresADL();
+
+        $datas = array_merge(
+            $this->setOrderAmount($order, $amount),
+            $this->setOrderData($order),
+            $this->setOrderCustomerData($order, $amount),
+            $this->setOrderConfig()
+        );
+
+        $response = $client->post($amount > 0 ? "V4/Charge/CreatePayment" : "V4/Charge/CreateToken", $datas);
+
+        /* I check if there are some errors */
+        if ($response['status'] !== 'SUCCESS') {
+            $error = $response['answer'];
+            echo "error " . $error['errorCode'] . ": " . $error['errorMessage'], PHP_EOL;
+        }
+
+        return $response["answer"];
+    }
+
+    /**
+     * @param PaymentInterface $payment
+     * @return mixed|null
+     * @throws LyraException
+     */
+    public function cancelPayment(PaymentInterface $payment)
+    {
+        if (false === array_key_exists('uuid', $payment->getDetails())) {
+            return null;
+        }
+
+        $datas['uuid'] = $payment->getDetails()['uuid'];
+
+        return $this->getLyraClient()->post("V4/Transaction/CancelOrRefund", $datas);
+    }
+
+    public function validatePayment(string $uuid): void
+    {
+        if ($uuid !== null) {
+            $datas['uuid'] = $uuid;
+            $this->getLyraClient()->post("V4/Transaction/Validate", $datas);
+        }
+    }
+
+    /**
+     * @param Order $order
+     * @param int $amount
+     *
+     * @return array
+     */
+    protected function setOrderAmount(Order $order, int $amount): array
+    {
+        $payment = $order->getLastPayment();
+        $currency = $this->getCurrencyIso4217($payment->getCurrencyCode());
+        $hasOffresADL = $order->hasOffresADL();
+        $hasOffresATR = $order->hasOffresATR();
+
+        $datas = [];
+        $datas['contrib'] = "Sylius 1.8";
+        $datas['currency'] = $currency->getAlpha3();
+        if ($amount > 0){
+            $datas['amount'] = $amount;
+            $datas['formAction'] = $hasOffresADL || $hasOffresATR ? 'REGISTER_PAY' : 'PAYMENT';
+        }else {
+            $datas['formAction'] = 'REGISTER';
+        }
+
+        return $datas;
+    }
+
+    /**
+     * @param Order $order
+     *
+     * @return array
+     */
+    protected function setOrderData(Order $order): array
+    {
+        $comment = "Order ID: {$order->getId()}";
+        if (null !== $customer = $order->getCustomer()) {
+            $comment .= ", Customer: {$customer->getId()}";
+        }
+
+        $datas = [];
+        $datas['orderId'] = $order->getNumber();
+        $datas['metadata'] = [ "orderInfo1" => $comment ];
+
+        $productDatas = [];
+        /** @var OrderItemInterface $orderItem */
+        foreach ($order->getItems()->toArray() as $orderItem){
+            /** @var Product $product */
+            $product = $orderItem->getProduct();
+            $productDatas["productLabel"] = $this->specialChars($product->getName());
+            $productDatas["productAmount"] = $orderItem->getUnitPrice();
+            $productDatas["productType"] = 'ENTERTAINMENT';
+            $productDatas["productRef"] = $product->getCode();
+            $productDatas["productQty"] = $orderItem->getQuantity();
+            $productDatas[] = $productDatas;
+        }
+
+        $shoppingCartDatas = [];
+        $shoppingCartDatas['cartItemInfo'] = $productDatas;
+        $datas['shoppingCart'] = $shoppingCartDatas;
+
+        return $datas;
+    }
+
+    /**
+     * @param Order $order
+     * @param int $amount
+     * @return array
+     */
+    protected function setOrderCustomerData(Order $order, int $amount): array
+    {
+        $datas = [];
+
+        /** @var Customer $customer */
+        if (null !== $customer = $order->getCustomer()) {
+            $defaultAddress = $customer->getDefaultAddress();
+            $billingAddress = $order->getBillingAddress();
+
+            $customerDatas = [];
+            $customerDatas['reference'] = $customer->getId();
+            $customerDatas['email'] = $customer->getEmail();
+
+            $billingDetailsData['title'] = $customer->getGender() === 'm' ? 'Mr' : 'Mme';
+            $billingDetailsData['category'] = $defaultAddress !== null && !empty($defaultAddress->getCompany()) ? 'COMPANY' : 'PRIVATE';
+            $billingDetailsData['firstName'] = $this->specialChars($customer->getFirstName());
+            $billingDetailsData['lastName'] = $this->specialChars($customer->getLastName());
+            $billingDetailsData['legalName'] = $defaultAddress !== null && !empty($defaultAddress->getCompany()) ? $this->specialChars($defaultAddress->getCompany()) : '';
+            $billingDetailsData['cellPhoneNumber'] = '';
+            $billingDetailsData['phoneNumber'] = $customer->getPhoneNumber();
+            $billingDetailsData['streetNumber'] = '';
+            $billingDetailsData['address'] = $defaultAddress !== null && !empty($defaultAddress->getStreet()) ? $this->specialChars($defaultAddress->getStreet()) : '';
+            $billingDetailsData['district'] = '';
+            $billingDetailsData['zipCode'] = $defaultAddress !== null && !empty($defaultAddress->getPostcode()) ? $defaultAddress->getPostcode() : '';
+            $billingDetailsData['city'] = $defaultAddress !== null && !empty($defaultAddress->getCity()) ? $this->specialChars($defaultAddress->getCity()) : '';
+            $billingDetailsData['state'] = '';
+            $billingDetailsData['country'] = $defaultAddress !== null && !empty($defaultAddress->getCountryCode()) ? $defaultAddress->getCountryCode() : '';
+            $customerDatas['billingDetails'] = $billingDetailsData;
+
+            if ($amount > 0) {
+                $shippingDetailsData['city'] = $billingAddress !== null && !empty($billingAddress->getCity()) ? $this->specialChars($billingAddress->getCity()) : '';
+                $shippingDetailsData['country'] = $billingAddress !== null && !empty($billingAddress->getCountryCode()) ? $billingAddress->getCountryCode() : '';
+                $shippingDetailsData['district'] = '';
+                $shippingDetailsData['firstName'] = $billingAddress !== null && !empty($billingAddress->getFirstName()) ? $this->specialChars($billingAddress->getFirstName()) : '';
+                $shippingDetailsData['lastName'] = $billingAddress !== null && !empty($billingAddress->getLastName()) ? $this->specialChars($billingAddress->getLastName()) : '';
+                $shippingDetailsData['legalName'] = $billingAddress !== null && !empty($billingAddress->getCompany()) ? $this->specialChars($billingAddress->getCompany()) : '';
+                $shippingDetailsData['phoneNumber'] = $billingAddress !== null && !empty($billingAddress->getPhoneNumber()) ? $billingAddress->getPhoneNumber() : '';
+                $shippingDetailsData['state'] = '';
+                $shippingDetailsData['category'] = $billingAddress !== null && !empty($billingAddress->getCompany()) ? 'COMPANY' : 'PRIVATE';
+                $shippingDetailsData['streetNumber'] = '';
+                $shippingDetailsData['address'] = $billingAddress !== null && !empty($billingAddress->getStreet()) ? $this->specialChars($billingAddress->getStreet()) : '';
+                $shippingDetailsData['address2'] = $billingAddress !== null && !empty($billingAddress->getStreetComplement()) ? $this->specialChars($billingAddress->getStreetComplement()) : '';
+                $shippingDetailsData['zipCode'] = $billingAddress !== null && !empty($billingAddress->getPostcode()) ? $billingAddress->getPostcode() : '';
+                $customerDatas['shippingDetails'] = $shippingDetailsData;
+            }
+
+            $datas['customer'] = $customerDatas;
+        }
+
+        return $datas;
+    }
+
+    /**
+     * @return array
+     */
+    protected function setOrderConfig(): array
+    {
+        $datas = [];
+        $datas['ipnTargetUrl'] = $this->config['ipn'];
+        $datas['transactionOptions']['cardOptions']['manualValidation'] = 'YES';
+
+        return $datas;
+    }
+
+    /**
+     * @param $str
+     * @return array|string|string[]|null
+     */
+    private function specialChars($str)
+    {
+        $transliteration = array(
+            'Á' => 'A', 'À' => 'A', 'Â' => 'A', 'Ä' => 'A', 'Ã' => 'A', 'Å' => 'A', 'Ç' => 'C', 'É' => 'E', 'È' => 'E', 'Ê' => 'E', 'Ë' => 'E', 'Í' => 'I', 'Ï' => 'I', 'Î' => 'I', 'Ì' => 'I', 'Ñ' => 'N', 'Ó' => 'O', 'Ò' => 'O', 'Ô' => 'O', 'Ö' => 'O', 'Õ' => 'O', 'Ú' => 'U', 'Ù' => 'U', 'Û' => 'U', 'Ü' => 'U', 'Ý' => 'Y', 'á' => 'a', 'à' => 'a', 'â' => 'a', 'ä' => 'a', 'ã' => 'a', 'å' => 'a', 'ç' => 'c', 'é' => 'e', 'è' => 'e', 'ê' => 'e', 'ë' => 'e', 'í' => 'i', 'ì' => 'i', 'î' => 'i', 'ï' => 'i', 'ñ' => 'n', 'ó' => 'o', 'ò' => 'o', 'ô' => 'o', 'ö' => 'o', 'õ' => 'o', 'ú' => 'u', 'ù' => 'u', 'û' => 'u', 'ü' => 'u', 'ý' => 'y', 'ÿ' => 'y',
+            "\xC2\x82" => "'", // U+0082⇒U+201A single low-9 quotation mark
+            "\xC2\x84" => '"', // U+0084⇒U+201E double low-9 quotation mark
+            "\xC2\x8B" => "'", // U+008B⇒U+2039 single left-pointing angle quotation mark
+            "\xC2\x91" => "'", // U+0091⇒U+2018 left single quotation mark
+            "\xC2\x92" => "'", // U+0092⇒U+2019 right single quotation mark
+            "\xC2\x93" => '"', // U+0093⇒U+201C left double quotation mark
+            "\xC2\x94" => '"', // U+0094⇒U+201D right double quotation mark
+            "\xC2\x9B" => "'", // U+009B⇒U+203A single right-pointing angle quotation mark
+            // Regular Unicode     // U+0022 quotation mark (")
+            // U+0027 apostrophe     (')
+            "\xC2\xAB"     => '"', // U+00AB left-pointing double angle quotation mark
+            "\xC2\xBB"     => '"', // U+00BB right-pointing double angle quotation mark
+            "\xE2\x80\x98" => "'", // U+2018 left single quotation mark
+            "\xE2\x80\x99" => "'", // U+2019 right single quotation mark
+            "\xE2\x80\x9A" => "'", // U+201A single low-9 quotation mark
+            "\xE2\x80\x9B" => "'", // U+201B single high-reversed-9 quotation mark
+            "\xE2\x80\x9C" => '"', // U+201C left double quotation mark
+            "\xE2\x80\x9D" => '"', // U+201D right double quotation mark
+            "\xE2\x80\x9E" => '"', // U+201E double low-9 quotation mark
+            "\xE2\x80\x9F" => '"', // U+201F double high-reversed-9 quotation mark
+            "\xE2\x80\xB9" => "'", // U+2039 single left-pointing angle quotation mark
+            "\xE2\x80\xBA" => "'",
+        );
+        $strModified = strtr($str, $transliteration);
+        return preg_replace("/[^A-Za-z0-9 ]/", ' ', $strModified);
+    }
+
+    /**
+     * @param $currencyCode
+     * @return Currency
+     */
+    private function getCurrencyIso4217($currencyCode): Currency
+    {
+        return is_numeric($currencyCode) ? Currency::createFromIso4217Numeric($currencyCode) : Currency::createFromIso4217Alpha3($currencyCode);
     }
 }
