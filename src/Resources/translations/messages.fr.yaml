@@ -28,7 +28,7 @@ akki:
         label: Clé publique
         help: a renseigner pour les embedded fields
       ipn:
-        label: Clé publique
+        label: URL de notification
         help: a renseigner pour les embedded fields
     endpoint:
       lyra: Lyra
