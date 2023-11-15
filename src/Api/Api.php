@@ -753,31 +753,34 @@ class Api
      */
     protected function setOrderData(Order $order): array
     {
-        $comment = "Order ID: {$order->getId()}";
+        $comment = "Order ID: {$order->getId()}, Order #: {$order->getNumber()}";
         if (null !== $customer = $order->getCustomer()) {
             $comment .= ", Customer: {$customer->getId()}";
         }
 
         $datas = [];
-        $datas['orderId'] = $order->getNumber();
-        $datas['metadata'] = [ "orderInfo1" => $comment ];
+        $datas['orderId'] = $order->getId();
+        $datas['metadata'] = [ "orderInfo" => $comment ];
 
-        $productDatas = [];
+        $producstDatas = [];
         /** @var OrderItemInterface $orderItem */
         foreach ($order->getItems()->toArray() as $orderItem){
             /** @var Product $product */
             $product = $orderItem->getProduct();
+            $productDatas = [];
             $productDatas["productLabel"] = $this->specialChars($product->getName());
             $productDatas["productAmount"] = $orderItem->getUnitPrice();
             $productDatas["productType"] = 'ENTERTAINMENT';
             $productDatas["productRef"] = $product->getCode();
             $productDatas["productQty"] = $orderItem->getQuantity();
-            $productDatas[] = $productDatas;
+            $producstDatas[] = $productDatas;
         }
 
         $shoppingCartDatas = [];
-        $shoppingCartDatas['cartItemInfo'] = $productDatas;
-        $datas['shoppingCart'] = $shoppingCartDatas;
+        $shoppingCartDatas['cartItemInfo'] = $producstDatas;
+        $customerDatas = [];
+        $customerDatas['shoppingCart'] = $shoppingCartDatas;
+        $datas['customer'] = $customerDatas;
 
         return $datas;
     }
