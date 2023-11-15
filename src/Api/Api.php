@@ -320,6 +320,8 @@ class Api
                 'password',
                 'sha256key',
                 'public_key',
+                'ipn',
+                'payment_cards',
             ])
             ->setDefaults([
                 'endpoint' => null,
@@ -331,6 +333,8 @@ class Api
             ->setAllowedTypes('password', 'string')
             ->setAllowedTypes('sha256key', 'string')
             ->setAllowedTypes('public_key', 'string')
+            ->setAllowedTypes('ipn', 'string')
+            ->setAllowedTypes('payment_cards', 'string')
             ->setAllowedValues('ctx_mode', $this->getModes())
             ->setAllowedTypes('directory', 'string')
             ->setAllowedValues('endpoint', $this->getEndPoints())
