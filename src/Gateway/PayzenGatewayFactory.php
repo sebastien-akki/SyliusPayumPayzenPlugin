@@ -59,38 +59,40 @@ class PayzenGatewayFactory extends GatewayFactory
 
         if (false == $config['payum.api']) {
             $config['payum.default_options'] = [
-                'site_id'     => null,
-                'certificate' => null,
-                'ctx_mode'    => null,
-                'directory'   => null,
-                'endpoint'    => null,
-                'hash_mode'   => Api::HASH_MODE_SHA256,
-                'debug'       => false,
-                'password'    => null,
-                'sha256key'   => null,
-                'public_key'  => null,
-                'ipn'         => null,
+                'site_id'       => null,
+                'certificate'   => null,
+                'ctx_mode'      => null,
+                'directory'     => null,
+                'endpoint'      => null,
+                'hash_mode'     => Api::HASH_MODE_SHA256,
+                'debug'         => false,
+                'password'      => null,
+                'sha256key'     => null,
+                'public_key'    => null,
+                'ipn'           => null,
+                'payment_cards' => null,
             ];
 
             $config->defaults($config['payum.default_options']);
 
-            $config['payum.required_options'] = ['site_id', 'certificate', 'ctx_mode', 'directory', 'password', 'sha256key', 'public_key', 'ipn'];
+            $config['payum.required_options'] = ['site_id', 'certificate', 'ctx_mode', 'directory', 'password', 'sha256key', 'public_key', 'ipn', 'payment_cards'];
 
             $config['payum.api'] = static function (ArrayObject $config) {
                 $config->validateNotEmpty($config['payum.required_options']);
 
                 $payzenConfig = [
-                    'endpoint'    => $config['endpoint'],
-                    'site_id'     => $config['site_id'],
-                    'certificate' => $config['certificate'],
-                    'ctx_mode'    => $config['ctx_mode'],
-                    'directory'   => $config['directory'],
-                    'hash_mode'   => $config['hash_mode'],
-                    'debug'       => $config['debug'],
-                    'password'    => $config['password'],
-                    'sha256key'   => $config['sha256key'],
-                    'public_key'  => $config['public_key'],
-                    'ipn'         => $config['ipn'],
+                    'endpoint'      => $config['endpoint'],
+                    'site_id'       => $config['site_id'],
+                    'certificate'   => $config['certificate'],
+                    'ctx_mode'      => $config['ctx_mode'],
+                    'directory'     => $config['directory'],
+                    'hash_mode'     => $config['hash_mode'],
+                    'debug'         => $config['debug'],
+                    'password'      => $config['password'],
+                    'sha256key'     => $config['sha256key'],
+                    'public_key'    => $config['public_key'],
+                    'ipn'           => $config['ipn'],
+                    'payment_cards' => $config['payment_cards'],
                 ];
 
                 $api = new Api();
