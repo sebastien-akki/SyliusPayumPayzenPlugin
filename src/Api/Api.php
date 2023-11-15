@@ -762,26 +762,6 @@ class Api
         $datas['orderId'] = $order->getId();
         $datas['metadata'] = [ "orderInfo" => $comment ];
 
-        $producstDatas = [];
-        /** @var OrderItemInterface $orderItem */
-        foreach ($order->getItems()->toArray() as $orderItem){
-            /** @var Product $product */
-            $product = $orderItem->getProduct();
-            $productDatas = [];
-            $productDatas["productLabel"] = $this->specialChars($product->getName());
-            $productDatas["productAmount"] = $orderItem->getUnitPrice();
-            $productDatas["productType"] = 'ENTERTAINMENT';
-            $productDatas["productRef"] = $product->getCode();
-            $productDatas["productQty"] = $orderItem->getQuantity();
-            $producstDatas[] = $productDatas;
-        }
-
-        $shoppingCartDatas = [];
-        $shoppingCartDatas['cartItemInfo'] = $producstDatas;
-        $customerDatas = [];
-        $customerDatas['shoppingCart'] = $shoppingCartDatas;
-        $datas['customer'] = $customerDatas;
-
         return $datas;
     }
 
@@ -793,13 +773,13 @@ class Api
     protected function setOrderCustomerData(Order $order, int $amount): array
     {
         $datas = [];
+        $customerDatas = [];
 
         /** @var Customer $customer */
         if (null !== $customer = $order->getCustomer()) {
             $defaultAddress = $customer->getDefaultAddress();
             $billingAddress = $order->getBillingAddress();
 
-            $customerDatas = [];
             $customerDatas['reference'] = $customer->getId();
             $customerDatas['email'] = $customer->getEmail();
 
@@ -836,8 +816,25 @@ class Api
                 $customerDatas['shippingDetails'] = $shippingDetailsData;
             }
 
-            $datas['customer'] = $customerDatas;
         }
+
+        $productsDatas = [];
+        /** @var OrderItemInterface $orderItem */
+        foreach ($order->getItems()->toArray() as $orderItem){
+            /** @var Product $product */
+            $product = $orderItem->getProduct();
+            $productDatas = [];
+            $productDatas["productLabel"] = $this->specialChars($product->getName());
+            $productDatas["productAmount"] = $orderItem->getUnitPrice();
+            $productDatas["productType"] = 'ENTERTAINMENT';
+            $productDatas["productRef"] = $product->getCode();
+            $productDatas["productQty"] = $orderItem->getQuantity();
+            $productsDatas[] = $productDatas;
+        }
+        $shoppingCartDatas = [];
+        $shoppingCartDatas['cartItemInfo'] = $productsDatas;
+        $customerDatas['shoppingCart'] = $shoppingCartDatas;
+        $datas['customer'] = $customerDatas;
 
         return $datas;
     }
