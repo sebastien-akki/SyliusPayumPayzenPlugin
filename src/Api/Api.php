@@ -788,28 +788,28 @@ class Api
             $billingDetailsData['firstName'] = $this->specialChars($customer->getFirstName());
             $billingDetailsData['lastName'] = $this->specialChars($customer->getLastName());
             $billingDetailsData['legalName'] = $defaultAddress !== null && !empty($defaultAddress->getCompany()) ? $this->specialChars($defaultAddress->getCompany()) : '';
-            $billingDetailsData['cellPhoneNumber'] = '';
+//            $billingDetailsData['cellPhoneNumber'] = '';
             $billingDetailsData['phoneNumber'] = $customer->getPhoneNumber();
-            $billingDetailsData['streetNumber'] = '';
+//            $billingDetailsData['streetNumber'] = '';
             $billingDetailsData['address'] = $defaultAddress !== null && !empty($defaultAddress->getStreet()) ? $this->specialChars($defaultAddress->getStreet()) : '';
-            $billingDetailsData['district'] = '';
+//            $billingDetailsData['district'] = '';
             $billingDetailsData['zipCode'] = $defaultAddress !== null && !empty($defaultAddress->getPostcode()) ? $defaultAddress->getPostcode() : '';
             $billingDetailsData['city'] = $defaultAddress !== null && !empty($defaultAddress->getCity()) ? $this->specialChars($defaultAddress->getCity()) : '';
-            $billingDetailsData['state'] = '';
+//            $billingDetailsData['state'] = '';
             $billingDetailsData['country'] = $defaultAddress !== null && !empty($defaultAddress->getCountryCode()) ? $defaultAddress->getCountryCode() : '';
             $customerDatas['billingDetails'] = $billingDetailsData;
 
             if ($amount > 0) {
                 $shippingDetailsData['city'] = $billingAddress !== null && !empty($billingAddress->getCity()) ? $this->specialChars($billingAddress->getCity()) : '';
                 $shippingDetailsData['country'] = $billingAddress !== null && !empty($billingAddress->getCountryCode()) ? $billingAddress->getCountryCode() : '';
-                $shippingDetailsData['district'] = '';
+//                $shippingDetailsData['district'] = '';
                 $shippingDetailsData['firstName'] = $billingAddress !== null && !empty($billingAddress->getFirstName()) ? $this->specialChars($billingAddress->getFirstName()) : '';
                 $shippingDetailsData['lastName'] = $billingAddress !== null && !empty($billingAddress->getLastName()) ? $this->specialChars($billingAddress->getLastName()) : '';
                 $shippingDetailsData['legalName'] = $billingAddress !== null && !empty($billingAddress->getCompany()) ? $this->specialChars($billingAddress->getCompany()) : '';
                 $shippingDetailsData['phoneNumber'] = $billingAddress !== null && !empty($billingAddress->getPhoneNumber()) ? $billingAddress->getPhoneNumber() : '';
-                $shippingDetailsData['state'] = '';
+//                $shippingDetailsData['state'] = '';
                 $shippingDetailsData['category'] = $billingAddress !== null && !empty($billingAddress->getCompany()) ? 'COMPANY' : 'PRIVATE';
-                $shippingDetailsData['streetNumber'] = '';
+//                $shippingDetailsData['streetNumber'] = '';
                 $shippingDetailsData['address'] = $billingAddress !== null && !empty($billingAddress->getStreet()) ? $this->specialChars($billingAddress->getStreet()) : '';
                 $shippingDetailsData['address2'] = $billingAddress !== null && !empty($billingAddress->getStreetComplement()) ? $this->specialChars($billingAddress->getStreetComplement()) : '';
                 $shippingDetailsData['zipCode'] = $billingAddress !== null && !empty($billingAddress->getPostcode()) ? $billingAddress->getPostcode() : '';
