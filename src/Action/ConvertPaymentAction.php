@@ -38,16 +38,16 @@ class ConvertPaymentAction implements ActionInterface, GatewayAwareInterface
 
         $model = ArrayObject::ensureArrayObject($payment->getDetails());
 
-        $this->setAmount($model, $payment);
-        $this->setDonneesCommande($model, $payment);
-        $this->setDonneesAcheteur($model, $payment);
-
-        /** @var PaymentMethodInterface $payment_method */
-        $payment_method = $payment->getMethod();
-
-        $config = $payment_method->getGatewayConfig()->getConfig();
-
-        $model['vads_payment_cards'] = $config['payment_cards'];
+//        $this->setAmount($model, $payment);
+//        $this->setDonneesCommande($model, $payment);
+//        $this->setDonneesAcheteur($model, $payment);
+//
+//        /** @var PaymentMethodInterface $payment_method */
+//        $payment_method = $payment->getMethod();
+//
+//        $config = $payment_method->getGatewayConfig()->getConfig();
+//
+//        $model['vads_payment_cards'] = $config['payment_cards'];
 
         $request->setResult((array)$model);
     }

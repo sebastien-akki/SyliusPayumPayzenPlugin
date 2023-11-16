@@ -19,7 +19,8 @@ final class ValidatePaymentAction extends AbstractApiAction
 
         $this->api->validatePayment($model['uuid']);
 
-        $model['order'] = $this->api->readOrder($model['uuid'])->__toString();
+        $order = $this->api->readOrder($model['uuid']);
+        $model['order'] = $order['answer'];
 
         $this->gateway->execute(new GetHumanStatus($model));
     }

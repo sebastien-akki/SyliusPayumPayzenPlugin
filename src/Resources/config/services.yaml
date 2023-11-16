@@ -11,13 +11,6 @@ services:
         tags:
             - { name: payum.gateway_factory_builder, factory: payzen }
 
-    akki.payzen.extension.from_foreign_gateway:
-        public: true
-        class: Akki\SyliusPayumPayzenPlugin\Extension\FromForeignGatewayExtension
-        tags:
-            - name: payum.extension
-              factory: payzen
-
     Akki\SyliusPayumPayzenPlugin\StateMachine\AbstractOrderProcessor:
         abstract: true
         arguments:
