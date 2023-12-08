@@ -30,6 +30,9 @@ akki:
       ipn:
         label: URL de notification
         help: a renseigner pour les embedded fields
+      ipn_update_cb:
+        label: URL de notification update CB
+        help: a renseigner pour les embedded fields
     endpoint:
       lyra: Lyra
       payzen: PayZen

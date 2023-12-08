@@ -321,6 +321,7 @@ class Api
                 'sha256key',
                 'public_key',
                 'ipn',
+                'ipn_update_cb',
                 'payment_cards',
             ])
             ->setDefaults([
@@ -334,6 +335,7 @@ class Api
             ->setAllowedTypes('sha256key', 'string')
             ->setAllowedTypes('public_key', 'string')
             ->setAllowedTypes('ipn', 'string')
+            ->setAllowedTypes('ipn_update_cb', 'string')
             ->setAllowedTypes('payment_cards', 'string')
             ->setAllowedValues('ctx_mode', $this->getModes())
             ->setAllowedTypes('directory', 'string')
@@ -624,12 +626,12 @@ class Api
 
     /**
      * @param Order $order
-     *
+     * @param bool $updateCb
      * @return array|null
      *
      * @throws LyraException
      */
-    public function getFormToken(Order $order): ?array
+    public function getFormToken(Order $order, bool $updateCb = false): ?array
     {
         $payment = $order->getLastPayment();
 
@@ -642,7 +644,7 @@ class Api
             $this->cancelPayment($payment);
         } catch (LyraException $exception) {}
 
-        $responseCreateOrder = $this->createOrder($order);
+        $responseCreateOrder = $this->createOrder($order,$updateCb);
 
         if ($responseCreateOrder) {
             return $responseCreateOrder;
@@ -668,11 +670,12 @@ class Api
 
     /**
      * @param Order $order
+     * @param bool $updateCb
      * @return array
      *
      * @throws LyraException
      */
-    public function createOrder(Order $order): array
+    public function createOrder(Order $order, bool $updateCb = false): array
     {
         $client = $this->getLyraClient();
 
@@ -682,7 +685,7 @@ class Api
             $this->setOrderAmount($order, $amount),
             $this->setOrderData($order),
             $this->setOrderCustomerData($order, $amount),
-            $this->setOrderConfig()
+            $this->setOrderConfig($updateCb)
         );
 
         $response = $client->post($amount > 0 ? "V4/Charge/CreatePayment" : "V4/Charge/CreateToken", $datas);
@@ -840,12 +843,14 @@ class Api
     }
 
     /**
+     * @param bool $updateCb
+     *
      * @return array
      */
-    protected function setOrderConfig(): array
+    protected function setOrderConfig(bool $updateCb = false): array
     {
         $datas = [];
-        $datas['ipnTargetUrl'] = $this->config['ipn'];
+        $datas['ipnTargetUrl'] = $updateCb ?$this->config['ipn_update_cb'] : $this->config['ipn'];
         $datas['transactionOptions']['cardOptions']['manualValidation'] = 'YES';
 
         return $datas;

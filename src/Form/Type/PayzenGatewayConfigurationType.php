@@ -95,6 +95,10 @@ final class PayzenGatewayConfigurationType extends AbstractType
                 'label' => 'akki.payzen.fields.ipn.label',
                 'help' => 'akki.payzen.fields.ipn.help',
             ])
+            ->add('ipn_update_cb', TextType::class, [
+                'label' => 'akki.payzen.fields.ipn_update_cb.label',
+                'help' => 'akki.payzen.fields.ipn_update_cb.help',
+            ])
         ;
     }
 }

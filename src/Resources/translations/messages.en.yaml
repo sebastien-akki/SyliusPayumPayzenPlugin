@@ -30,6 +30,9 @@ akki:
       ipn:
         label: traduction_missing
         help: traduction_missing
+      ipn_update_cb:
+        label: traduction_missing
+        help: traduction_missing
     endpoint:
       lyra: traduction_missing
       payzen: traduction_missing

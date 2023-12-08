@@ -70,12 +70,13 @@ class PayzenGatewayFactory extends GatewayFactory
                 'sha256key'     => null,
                 'public_key'    => null,
                 'ipn'           => null,
+                'ipn_update_cb' => null,
                 'payment_cards' => null,
             ];
 
             $config->defaults($config['payum.default_options']);
 
-            $config['payum.required_options'] = ['site_id', 'certificate', 'ctx_mode', 'directory', 'password', 'sha256key', 'public_key', 'ipn', 'payment_cards'];
+            $config['payum.required_options'] = ['site_id', 'certificate', 'ctx_mode', 'directory', 'password', 'sha256key', 'public_key', 'ipn', 'ipn_update_cb', 'payment_cards'];
 
             $config['payum.api'] = static function (ArrayObject $config) {
                 $config->validateNotEmpty($config['payum.required_options']);
@@ -92,6 +93,7 @@ class PayzenGatewayFactory extends GatewayFactory
                     'sha256key'     => $config['sha256key'],
                     'public_key'    => $config['public_key'],
                     'ipn'           => $config['ipn'],
+                    'ipn_update_cb'           => $config['ipn_update_cb'],
                     'payment_cards' => $config['payment_cards'],
                 ];
 
