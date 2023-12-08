@@ -626,12 +626,12 @@ class Api
 
     /**
      * @param Order $order
-     * @param bool $updateCb
+     * @param int $infosCbId
      * @return array|null
      *
      * @throws LyraException
      */
-    public function getFormToken(Order $order, bool $updateCb = false): ?array
+    public function getFormToken(Order $order, int $infosCbId = 0): ?array
     {
         $payment = $order->getLastPayment();
 
@@ -644,7 +644,7 @@ class Api
             $this->cancelPayment($payment);
         } catch (LyraException $exception) {}
 
-        $responseCreateOrder = $this->createOrder($order,$updateCb);
+        $responseCreateOrder = $this->createOrder($order,$infosCbId);
 
         if ($responseCreateOrder) {
             return $responseCreateOrder;
@@ -670,12 +670,12 @@ class Api
 
     /**
      * @param Order $order
-     * @param bool $updateCb
+     * @param int $infosCbId
      * @return array
      *
      * @throws LyraException
      */
-    public function createOrder(Order $order, bool $updateCb = false): array
+    public function createOrder(Order $order, int $infosCbId = 0): array
     {
         $client = $this->getLyraClient();
 
@@ -685,7 +685,7 @@ class Api
             $this->setOrderAmount($order, $amount),
             $this->setOrderData($order),
             $this->setOrderCustomerData($order, $amount),
-            $this->setOrderConfig($updateCb)
+            $this->setOrderConfig($infosCbId)
         );
 
         $response = $client->post($amount > 0 ? "V4/Charge/CreatePayment" : "V4/Charge/CreateToken", $datas);
@@ -843,14 +843,13 @@ class Api
     }
 
     /**
-     * @param bool $updateCb
-     *
+     * @param int $infosCbId
      * @return array
      */
-    protected function setOrderConfig(bool $updateCb = false): array
+    protected function setOrderConfig(int $infosCbId = 0): array
     {
         $datas = [];
-        $datas['ipnTargetUrl'] = $updateCb ?$this->config['ipn_update_cb'] : $this->config['ipn'];
+        $datas['ipnTargetUrl'] = $infosCbId > 0 ?$this->config['ipn_update_cb'].$infosCbId : $this->config['ipn'];
         $datas['transactionOptions']['cardOptions']['manualValidation'] = 'YES';
 
         return $datas;
