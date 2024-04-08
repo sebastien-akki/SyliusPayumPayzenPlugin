@@ -627,11 +627,12 @@ class Api
     /**
      * @param Order $order
      * @param int $infosCbId
+     * @param string $methodCode
      * @return array|null
      *
      * @throws LyraException
      */
-    public function getFormToken(Order $order, int $infosCbId = 0): ?array
+    public function getFormToken(Order $order, int $infosCbId = 0, string $methodCode): ?array
     {
         $payment = $order->getLastPayment();
 
@@ -644,7 +645,7 @@ class Api
             $this->cancelPayment($payment);
         } catch (LyraException $exception) {}
 
-        $responseCreateOrder = $this->createOrder($order,$infosCbId);
+        $responseCreateOrder = $this->createOrder($order,$infosCbId, $methodCode);
 
         if ($responseCreateOrder) {
             return $responseCreateOrder;
@@ -671,11 +672,12 @@ class Api
     /**
      * @param Order $order
      * @param int $infosCbId
+     * @param string $methodCode
      * @return array
      *
      * @throws LyraException
      */
-    public function createOrder(Order $order, int $infosCbId = 0): array
+    public function createOrder(Order $order, int $infosCbId = 0, string $methodCode): array
     {
         $client = $this->getLyraClient();
 
@@ -683,7 +685,7 @@ class Api
 
         $datas = array_merge(
             $this->setOrderAmount($order, $amount),
-            $this->setOrderData($order),
+            $this->setOrderData($order, $methodCode),
             $this->setOrderCustomerData($order, $amount),
             $this->setOrderConfig($infosCbId)
         );
@@ -751,10 +753,10 @@ class Api
 
     /**
      * @param Order $order
-     *
+     * @param string $methodCode
      * @return array
      */
-    protected function setOrderData(Order $order): array
+    protected function setOrderData(Order $order, string $methodCode): array
     {
         $comment = "Order ID: {$order->getId()}, Order #: {$order->getNumber()}";
         if (null !== $customer = $order->getCustomer()) {
@@ -763,7 +765,10 @@ class Api
 
         $datas = [];
         $datas['orderId'] = $order->getId();
-        $datas['metadata'] = [ "orderInfo" => $comment ];
+        $datas['metadata'] = [
+            "orderInfo" => $comment,
+            "methodCode" => $methodCode,
+        ];
 
         return $datas;
     }
