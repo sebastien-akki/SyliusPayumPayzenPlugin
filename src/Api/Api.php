@@ -14,6 +14,7 @@ use Sylius\Component\Core\Model\Order;
 use Sylius\Component\Core\Model\OrderItemInterface;
 use Sylius\Component\Core\Model\PaymentInterface;
 use Sylius\Component\Core\Model\Product;
+use Sylius\Component\Payment\Model\PaymentInterface as PaymentInterfaceAlias;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -641,9 +642,11 @@ class Api
         }
 
         //Si on n'arrive pas à annuler le paiement, on ne fait rien. On peut quand même récupérer le token.
-        try {
-            $this->cancelPayment($payment);
-        } catch (LyraException $exception) {}
+        if ($payment->getState() !== PaymentInterfaceAlias::STATE_COMPLETED) {
+            try {
+                $this->cancelPayment($payment);
+            } catch (LyraException $exception) {}
+        }
 
         $responseCreateOrder = $this->createOrder($order,$infosCbId, $methodCode);
 
