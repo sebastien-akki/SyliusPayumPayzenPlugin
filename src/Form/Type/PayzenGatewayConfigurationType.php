@@ -79,6 +79,26 @@ final class PayzenGatewayConfigurationType extends AbstractType
                     'akki.payzen.debug.yes' => true
                 ],
             ])
+            ->add('password', TextType::class, [
+                'label' => 'akki.payzen.fields.password.label',
+                'help' => 'akki.payzen.fields.password.help',
+            ])
+            ->add('sha256key', TextType::class, [
+                'label' => 'akki.payzen.fields.sha256key.label',
+                'help' => 'akki.payzen.fields.sha256key.help',
+            ])
+            ->add('public_key', TextType::class, [
+                'label' => 'akki.payzen.fields.public_key.label',
+                'help' => 'akki.payzen.fields.public_key.help',
+            ])
+            ->add('ipn', TextType::class, [
+                'label' => 'akki.payzen.fields.ipn.label',
+                'help' => 'akki.payzen.fields.ipn.help',
+            ])
+            ->add('ipn_update_cb', TextType::class, [
+                'label' => 'akki.payzen.fields.ipn_update_cb.label',
+                'help' => 'akki.payzen.fields.ipn_update_cb.help',
+            ])
         ;
     }
 }

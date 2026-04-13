@@ -11,9 +11,14 @@ services:
         tags:
             - { name: payum.gateway_factory_builder, factory: payzen }
 
-    akki.payzen.extension.from_foreign_gateway:
+    Akki\SyliusPayumPayzenPlugin\StateMachine\AbstractOrderProcessor:
+        abstract: true
+        arguments:
+            $payum: '@payum'
+
+    akki.sylius_payum_lyra.state_machine.validate_payment:
         public: true
-        class: Akki\SyliusPayumPayzenPlugin\Extension\FromForeignGatewayExtension
-        tags:
-            - name: payum.extension
-              factory: payzen
+        parent: Akki\SyliusPayumPayzenPlugin\StateMachine\AbstractOrderProcessor
+        class: Akki\SyliusPayumPayzenPlugin\StateMachine\ValidatePaymentOrderProcessor
+        arguments:
+            $smFactory: '@sm.factory'
