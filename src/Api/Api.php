@@ -329,6 +329,7 @@ class Api
                 'endpoint' => null,
                 'hash_mode' => self::HASH_MODE_SHA256,
                 'debug'    => false,
+                'payment_methods_filter' => null,
             ])
             ->setAllowedTypes('site_id', 'string')
             ->setAllowedTypes('certificate', 'string')
@@ -338,6 +339,7 @@ class Api
             ->setAllowedTypes('ipn', 'string')
             ->setAllowedTypes('ipn_update_cb', 'string')
             ->setAllowedTypes('payment_cards', 'string')
+            ->setAllowedTypes('payment_methods_filter', 'string')
             ->setAllowedValues('ctx_mode', $this->getModes())
             ->setAllowedTypes('directory', 'string')
             ->setAllowedValues('endpoint', $this->getEndPoints())
@@ -633,7 +635,7 @@ class Api
      *
      * @throws LyraException
      */
-    public function getFormToken(Order $order, int $infosCbId = 0, string $methodCode): ?array
+    public function getFormToken(Order $order, int $infosCbId = 0, string $methodCode, array $paymentMethods = []): ?array
     {
         $payment = $order->getLastPayment();
 
@@ -648,7 +650,7 @@ class Api
             } catch (LyraException $exception) {}
         }
 
-        $responseCreateOrder = $this->createOrder($order,$infosCbId, $methodCode);
+        $responseCreateOrder = $this->createOrder($order, $infosCbId, $methodCode, $paymentMethods);
 
         if ($responseCreateOrder) {
             return $responseCreateOrder;
@@ -680,7 +682,7 @@ class Api
      *
      * @throws LyraException
      */
-    public function createOrder(Order $order, int $infosCbId = 0, string $methodCode): array
+    public function createOrder(Order $order, int $infosCbId = 0, string $methodCode, array $paymentMethods = []): array
     {
         $client = $this->getLyraClient();
 
@@ -692,6 +694,11 @@ class Api
             $this->setOrderCustomerData($order, $amount),
             $this->setOrderConfig($infosCbId)
         );
+
+        // Filtrage des moyens de paiement pour le SmartForm (ex: PAYPAL, APPLE_PAY, GOOGLE_PAY, SAMSUNG_PAY)
+        if (!empty($paymentMethods)) {
+            $datas['paymentMethods'] = $paymentMethods;
+        }
 
         $response = $client->post($amount > 0 ? "V4/Charge/CreatePayment" : "V4/Charge/CreateToken", $datas);
 

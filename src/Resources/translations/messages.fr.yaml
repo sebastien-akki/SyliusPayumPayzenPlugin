@@ -12,6 +12,9 @@ akki:
         label: Clé
       payment_cards:
         label: Moyens de paiements autorisés
+      payment_methods_filter:
+        label: Méthodes de paiement
+        help: a renseigner pour les embedded fields
       ctx_mode:
         label: Mode
       directory:

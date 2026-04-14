@@ -12,6 +12,9 @@ akki:
         label: traduction_missing
       payment_cards:
         label: traduction_missing
+      payment_methods_filter:
+        label: traduction_missing
+        help: traduction_missing
       ctx_mode:
         label: traduction_missing
       directory:

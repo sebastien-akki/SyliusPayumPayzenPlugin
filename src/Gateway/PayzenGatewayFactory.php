@@ -72,6 +72,7 @@ class PayzenGatewayFactory extends GatewayFactory
                 'ipn'           => null,
                 'ipn_update_cb' => null,
                 'payment_cards' => null,
+                'payment_methods_filter' => null,
             ];
 
             $config->defaults($config['payum.default_options']);
@@ -95,6 +96,7 @@ class PayzenGatewayFactory extends GatewayFactory
                     'ipn'           => $config['ipn'],
                     'ipn_update_cb'           => $config['ipn_update_cb'],
                     'payment_cards' => $config['payment_cards'],
+                    'payment_methods_filter' => $config['payment_methods_filter'],
                 ];
 
                 $api = new Api();

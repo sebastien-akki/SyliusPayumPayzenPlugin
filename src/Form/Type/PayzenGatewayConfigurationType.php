@@ -99,6 +99,11 @@ final class PayzenGatewayConfigurationType extends AbstractType
                 'label' => 'akki.payzen.fields.ipn_update_cb.label',
                 'help' => 'akki.payzen.fields.ipn_update_cb.help',
             ])
+            ->add('payment_methods_filter', TextType::class, [
+                'label' => 'akki.payzen.fields.payment_methods_filter.label',
+                'help' => 'akki.payzen.fields.payment_methods_filter.help',
+                'required' => false,
+            ])
         ;
     }
 }
