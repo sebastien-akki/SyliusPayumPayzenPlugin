@@ -330,6 +330,7 @@ class Api
                 'hash_mode' => self::HASH_MODE_SHA256,
                 'debug'    => false,
                 'payment_methods_filter' => null,
+                'payment_methods_mobile_only' => null,
             ])
             ->setAllowedTypes('site_id', 'string')
             ->setAllowedTypes('certificate', 'string')
@@ -340,6 +341,7 @@ class Api
             ->setAllowedTypes('ipn_update_cb', 'string')
             ->setAllowedTypes('payment_cards', 'string')
             ->setAllowedTypes('payment_methods_filter', 'string')
+            ->setAllowedTypes('payment_methods_mobile_only', 'string')
             ->setAllowedValues('ctx_mode', $this->getModes())
             ->setAllowedTypes('directory', 'string')
             ->setAllowedValues('endpoint', $this->getEndPoints())
@@ -753,7 +755,13 @@ class Api
         $datas['currency'] = $currency->getAlpha3();
         if ($amount > 0){
             $datas['amount'] = $amount;
-            $datas['formAction'] = $hasOffresADL || $hasOffresATR ? 'REGISTER_PAY' : 'PAYMENT';
+            if ($hasOffresADL || $hasOffresATR) {
+                $datas['formAction'] = 'REGISTER_PAY';
+                // Active les X-Pay (Apple Pay, Google Pay, Samsung Pay) sur les paniers avec abonnement (ADL/ATR)
+                $datas['useCase'] = 'RECURRING_VARIABLE_TOTAL_AMOUNT';
+            } else {
+                $datas['formAction'] = 'PAYMENT';
+            }
         }else {
             $datas['formAction'] = 'REGISTER';
         }

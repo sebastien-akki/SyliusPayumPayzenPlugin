@@ -104,6 +104,11 @@ final class PayzenGatewayConfigurationType extends AbstractType
                 'help' => 'akki.payzen.fields.payment_methods_filter.help',
                 'required' => false,
             ])
+            ->add('payment_methods_mobile_only', TextType::class, [
+                'label' => 'akki.payzen.fields.payment_methods_mobile_only.label',
+                'help' => 'akki.payzen.fields.payment_methods_mobile_only.help',
+                'required' => false,
+            ])
         ;
     }
 }

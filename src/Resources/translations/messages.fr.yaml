@@ -15,6 +15,9 @@ akki:
       payment_methods_filter:
         label: Méthodes de paiement
         help: a renseigner pour les embedded fields
+      payment_methods_mobile_only:
+        label: Méthodes de paiement réservées au mobile
+        help: "Sous-ensemble de \"Méthodes de paiement\" masqué en desktop (ex : APPLE_PAY;GOOGLEPAY;SAMSUNG_PAY)"
       ctx_mode:
         label: Mode
       directory:
