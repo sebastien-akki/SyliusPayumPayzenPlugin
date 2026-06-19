@@ -763,7 +763,9 @@ class Api
                 $datas['formAction'] = 'PAYMENT';
             }
         }else {
+            // Prise d'empreinte seule : nécessite aussi useCase pour activer les X-Pay (info Lyra)
             $datas['formAction'] = 'REGISTER';
+            $datas['useCase'] = 'RECURRING_VARIABLE_TOTAL_AMOUNT';
         }
 
         return $datas;
